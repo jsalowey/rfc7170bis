@@ -18,8 +18,13 @@ pi:    # can use array (if all yes) or hash here
 
 author:
 
+- ins: A. DeKok (Ed)
+  name: Alan DeKok
+  email: aland@freeradius.org
+
 - ins: H. Zhou
   name: Hao Zhou
+  email: hzhou@cisco.com
 
 - ins: J. Salowey
   name: Joseph Salowey
@@ -32,6 +37,7 @@ author:
 
 - ins: S. Hanna
   name: Stephen Hanna
+  email: steve.hanna@infineon.com
 
 normative:
   BCP14: RFC8174
@@ -108,7 +114,7 @@ secure communication between a peer and a server by using the
 Transport Layer Security (TLS) protocol to establish a mutually
 authenticated tunnel.  Within the tunnel, TLV objects are used to
 convey authentication-related data between the EAP peer and the EAP
-server.
+server.  This document replaces RFC 7170.
 
 --- middle
 
@@ -3259,6 +3265,20 @@ described in [](#cert-provisioning) was inspired by the technique described in
 Helpful review comments were provided by Russ Housley, Jari Arkko,
 Ilan Frenkel, Jeremy Steiglitz, Dan Harkins, Sam Hartman, Jim Schaad,
 Barry Leiba, Stephen Farrell, Chris Lonvick, and Josh Howlett.
+
+# Changes from RFC 7170
+
+Alan DeKok was added as editor.
+
+The document was converted to Markdown, from the RFC 7170 output.
+
+Formatting changes result from differences between using Markdown
+versus XML for source.
+
+The IANA considerations section was removed, as the registries already
+exist.
+
+There should be no other content changes from RFC 7170.
 
 # Appendix A Evaluation against Tunnel-Based EAP Method Requirements
 {:numbered="false"}

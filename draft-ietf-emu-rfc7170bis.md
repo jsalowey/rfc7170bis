@@ -1,7 +1,7 @@
 ---
 title: Tunnel Extensible Authentication Protocol (TEAP) Version 1
 abbrev: TEAP
-docname: draft-dekok-emu-rfc7170bis-00
+docname: draft-ietf-emu-rfc7170bis-00
 
 stand_alone: true
 ipr: trust200902

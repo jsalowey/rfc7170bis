@@ -1,4 +1,4 @@
-DRAFT	:= draft-dekok-emu-rfc7170bis
+DRAFT	:= draft-ietf-emu-rfc7170bis
 VERSION	:= $(shell sed -n -e'/docname/s,.*[^0-9]*-\([0-9]*\).*,\1,p' ${DRAFT}.md )
 EXAMPLES =
 

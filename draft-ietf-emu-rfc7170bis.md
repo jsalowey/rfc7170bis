@@ -2728,7 +2728,7 @@ length is 64 octets.  Optional data parameter is not used in the
 derivation.
 
 > IMSK = First 32 octets of TLS-PRF(EMSK, "TEAPbindkey@ietf.org" \|\|
-"\0" \|\| 64)
+"\0", 64)
 >
 > where "\||" denotes concatenation, EMSK is the EMSK from the inner
 > method, "TEAPbindkey@ietf.org" consists the ASCII value for the

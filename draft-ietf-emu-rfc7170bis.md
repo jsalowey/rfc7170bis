@@ -2825,14 +2825,15 @@ The Compound MAC computation is as follows:
 ~~~~
 
 where j is the number of the last successfully executed inner EAP
-method, MAC is the MAC function negotiated in TLS 1.2 {{RFC5246}}, and
+method, MAC is the MAC function negotiated in TLS (e.g. TLS 1.2 in {{RFC5246}}), and
 BUFFER is created after concatenating these fields in the following
 order:
 
 1. The entire Crypto-Binding TLV attribute with both the EMSK and MSK
  Compound MAC fields zeroed out.
 
-2. The EAP Type sent by the other party in the first TEAP message.
+2. The EAP Type sent by the other party in the first TEAP message,
+which MUST be TEAP, encoded as one octet of 0x37.
 
 3. All the Outer TLVs from the first TEAP message sent by EAP server
 to peer.  If a single TEAP message is fragmented into multiple

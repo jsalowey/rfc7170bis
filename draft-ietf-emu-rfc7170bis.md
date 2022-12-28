@@ -564,9 +564,9 @@ method, first using machine credentials followed by a second instance
 using user credentials.
 
 EAP method messages are carried within EAP-Payload TLVs defined in
-[](#eap-payload-tlv).  If more than one method is going to be executed in
-the tunnel, then upon method completion, the server MUST send an
-Intermediate-Result TLV indicating the result.  The peer MUST respond
+[](#eap-payload-tlv).  Upon completion of each EAP method in
+the tunnel, the server MUST send an Intermediate-Result TLV
+indicating the result.  The peer MUST respond
 to the Intermediate-Result TLV indicating its result.  If the result
 indicates success, the Intermediate-Result TLV MUST be accompanied by
 a Crypto-Binding TLV.  The Crypto-Binding TLV is further discussed in

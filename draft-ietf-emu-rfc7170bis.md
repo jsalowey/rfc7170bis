@@ -2793,13 +2793,14 @@ of S-IMCK is as follows:
 ~~~~
    S-IMCK[0] = session_key_seed
    For j = 1 to n-1 do
-        IMCK[j] = TLS-PRF(S-IMCK[j-1], "Inner Methods Compound Keys",
+        IMCK[j] = TLS-PRF(S-IMCK[j-1],
+             "Inner Methods Compound Keys" \|\|
              IMSK[j], 60)
         S-IMCK[j] = first 40 octets of IMCK[j]
         CMK[j] = last 20 octets of IMCK[j]
 ~~~~
 
-where TLS-PRF is the PRF negotiated as part of TLS handshake
+where "\||" denotes concatenation, and TLS-PRF is the PRF negotiated as part of TLS handshake
 {{RFC5246}}.
 
 ## Computing the Compound MAC {#computing-compound-mac}

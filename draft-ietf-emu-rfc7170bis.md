@@ -594,10 +594,20 @@ authentication by sending a Basic-Password-Auth-Req TLV defined in
 authentication, then it responds with a Basic-Password-Auth-Resp TLV
 as defined in Section 4.2.15 that contains the username and password.
 If it does not wish to perform password authentication, then it
-responds with a NAK TLV indicating the rejection of the Basic-
-Password-Auth-Req TLV.  Upon receiving the response, the server
-indicates the success or failure of the exchange using an
-Intermediate-Result TLV.  Multiple round trips of password
+responds with a NAK TLV indicating the rejection of the Basic-Password-Auth-Req TLV.
+
+Upon completion of password authentication in
+the tunnel, the server MUST send an Intermediate-Result TLV
+indicating the result.  The peer MUST respond
+to the Intermediate-Result TLV indicating its result.  If the result
+indicates success, the Intermediate-Result TLV MUST be accompanied by
+a Crypto-Binding TLV.  The Crypto-Binding TLV is further discussed in
+[](#crypto-binding-tlv) and [](#computing-compound-mac).  The Intermediate-Result TLVs can be
+included with other TLVs which indicate a subsequent authentication,
+or with the Result TLV used in the protected termination
+exchange.
+
+Multiple round trips of password
 authentication requests and responses MAY be used to support some
 "housecleaning" functions such as a password or pin change before a
 user is authenticated.
@@ -622,8 +632,8 @@ establishment.  The Crypto-Binding TLV MUST be exchanged and verified
 before the final Result TLV exchange, regardless of whether or not
 there is an inner EAP method authentication.  The Crypto-Binding TLV
 and Intermediate-Result TLV MUST be included to perform cryptographic
-binding after each successful EAP method in a sequence of one or more
-EAP methods.  The server may send the final Result TLV along with an
+binding after each successful authentication in a sequence of one or more
+inner authentications.  The server may send the final Result TLV along with an
 Intermediate-Result TLV and a Crypto-Binding TLV to indicate its
 intention to end the conversation.  If the peer requires nothing more
 from the server, it will respond with a Result TLV indicating success
@@ -713,7 +723,7 @@ TEAP uses the error-handling rules summarized below:
 in all phases of TEAP.
 
 3. The Intermediate-Result TLVs carry success or failure indications
-of the individual EAP methods in TEAP Phase 2.  Errors within the
+of the individual inner authentication methods in TEAP Phase 2.  Errors within the
 EAP conversation in Phase 2 are expected to be handled by
 individual EAP methods.
 
@@ -1827,9 +1837,9 @@ TLVs
 
 ### Intermediate-Result TLV {#intermediate-result-tlv}
 
-The Intermediate-Result TLV provides support for acknowledged
-intermediate Success and Failure messages between multiple inner EAP
-methods within EAP.  An Intermediate-Result TLV indicating success
+The Intermediate-Result TLV signals
+intermediate Success and Failure messages for all inner authentication
+methods.  The Intermediate-Result TLV MUST be be used for all inner authentication methods.  An Intermediate-Result TLV indicating success
 MUST be accompanied by a Crypto-Binding TLV.  The optional TLVs
 associated with this TLV are provided for future extensibility to
 provide hints about the current result.  The Intermediate-Result TLV
@@ -2207,10 +2217,10 @@ establishment.
 
 The Crypto-Binding TLV MUST be exchanged and verified before the
 final Result TLV exchange, regardless of whether there is an inner
-EAP method authentication or not.  It MUST be included with the
+authentication method or not.  It MUST be included with the
 Intermediate-Result TLV to perform cryptographic binding after each
-successful EAP method in a sequence of EAP methods, before proceeding
-with another inner EAP method.  The Crypto-Binding TLV is valid only
+successful inner authentication in a sequence of authentication methods, before proceeding
+with another inner authentication method.  The Crypto-Binding TLV is valid only
 if the following checks pass:
 
 o  The Crypto-Binding TLV version is supported.
@@ -3574,10 +3584,12 @@ conversation will appear as follows:
        optional additional exchanges (new pin mode,
        password change, etc.) ...
 
-                            <- Crypto-Binding TLV (Request),
+                            <- Intermediate-Result-TLV (Success),
+                                Crypto-Binding TLV (Request),
                                 Result TLV (Success),
                                 (Optional PAC TLV)
 
+       Intermediate-Result-TLV (Success),
        Crypto-Binding TLV(Response),
        Result TLV (Success),
        (PAC-Acknowledgement TLV) ->
@@ -3629,8 +3641,10 @@ wrong user credentials.  The conversation will appear as follows:
        Basic-Password-Auth-Resp TLV, Response with both
        username and password) ->
 
-                               <- Result TLV (Failure)
+                               <- Intermediate-Result-TLV (Failure),
+                                  Result TLV (Failure)
 
+       Intermediate-Result-TLV (Failure),
        Result TLV (Failure) ->
 
        TLS channel torn down

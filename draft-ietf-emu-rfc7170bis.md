@@ -2865,6 +2865,8 @@ follows:
 where j is the number of the last successfully executed inner EAP
 method.
 
+TODO: rectify with 5.2
+
 The EMSK is typically only known to the TEAP peer and server and is
 not provided to a third party.  The derivation of additional keys and
 transportation of these keys to a third party are outside the scope

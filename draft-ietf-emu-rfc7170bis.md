@@ -2294,6 +2294,8 @@ Flags
 >> 2  MSK Compound MAC is present
 >>
 >> 3  Both EMSK and MSK Compound MAC are present
+>>
+>> TODO: What if there is just Basic-Password-Auth, and no EAP method?
 
 Sub-Type
 
@@ -2844,6 +2846,8 @@ message MUST be included.
 the EAP server.  If a single TEAP message is fragmented into
 multiple TEAP packets, then the Outer TLVs in all the fragments of
 that message MUST be included.
+
+TODO: What if there is just Basic-Password-Auth, and no EAP method?
 
 ## EAP Master Session Key Generation
 

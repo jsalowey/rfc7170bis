@@ -86,6 +86,7 @@ informative:
   RFC5280:
   RFC5281:
   RFC5421:
+  RFC5422:
   RFC5652:
   RFC5931:
   RFC6066:
@@ -611,6 +612,15 @@ Multiple round trips of password
 authentication requests and responses MAY be used to support some
 "housecleaning" functions such as a password or pin change before a
 user is authenticated.
+
+### EAP-MSCHAPv2
+
+If using EAP-MSCHAPv2 as an inner method, the EAP-FAST-MSCHAPv2
+variant defined in Section 3.2.3 of {{RFC5422}} MUST be used.
+
+The difference between EAP-MSCHAPv2 and EAP-FAST-MSCHAPv2 is that the
+first and the second 16 octets of EAP-MSCHAPv2 MSK are swapped when it
+is used as the IMSK for TEAP.
 
 ### Protected Termination and Acknowledged Result Indication {#protected-termination}
 

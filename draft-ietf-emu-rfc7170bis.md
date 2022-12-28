@@ -628,7 +628,7 @@ The Crypto-Binding TLV exchange is used to prove that both the peer
 and server participated in the tunnel establishment and sequence of
 authentications.  It also provides verification of the TEAP type,
 version negotiated, and Outer TLVs exchanged before the TLS tunnel
-establishment.  The Crypto-Binding TLV MUST be exchanged and verified
+establishment.  Except as noted below, the Crypto-Binding TLV MUST be exchanged and verified
 before the final Result TLV exchange, regardless of whether or not
 there is an inner EAP method authentication.  The Crypto-Binding TLV
 and Intermediate-Result TLV MUST be included to perform cryptographic

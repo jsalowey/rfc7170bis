@@ -105,7 +105,7 @@ informative:
 venue:
   group: EMU
   mail: emu@ietf.org
-  github: alandekok/rfc7170bis.git
+  github: emu-wg/rfc7170bis.git
 
 --- abstract
 

@@ -115,7 +115,7 @@ secure communication between a peer and a server by using the
 Transport Layer Security (TLS) protocol to establish a mutually
 authenticated tunnel.  Within the tunnel, TLV objects are used to
 convey authentication-related data between the EAP peer and the EAP
-server.  This document replaces RFC 7170.
+server.  This document obseletes RFC 7170.
 
 --- middle
 

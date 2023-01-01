@@ -1,7 +1,7 @@
 ---
 title: Tunnel Extensible Authentication Protocol (TEAP) Version 1
 abbrev: TEAP
-docname: draft-ietf-emu-rfc7170bis-01
+docname: draft-ietf-emu-rfc7170bis-02
 
 stand_alone: true
 ipr: trust200902
@@ -57,6 +57,11 @@ informative:
     date: December 2017
     author:
       name: IEEE
+  KAMATH:
+     title: "Microsoft EAP CHAP Extensions"
+     date: June 2007
+     author:
+	name: Ryan Hurst and Ashwin Palekar
   NIST-SP-800-57:
     title: "Recommendation for Key Management"
     date: July 2012
@@ -616,7 +621,7 @@ user is authenticated.
 
 ### EAP-MSCHAPv2
 
-If using EAP-MSCHAPv2 as an inner method, the EAP-FAST-MSCHAPv2
+If using EAP-MSCHAPv2 [KAMATH] as an inner method, the EAP-FAST-MSCHAPv2
 variant defined in Section 3.2.3 of {{RFC5422}} MUST be used.
 
 The difference between EAP-MSCHAPv2 and EAP-FAST-MSCHAPv2 is that the

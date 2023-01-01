@@ -1288,7 +1288,7 @@ Value
 
 M
 
-> 0 (Optional)
+> 0 - Optional TLV
 
 R
 
@@ -1344,7 +1344,7 @@ The Identity-Type TLV is defined as follows:
 
 M
 
-> 0 (Optional)
+> 0 - Optional TLV
 
 R
 
@@ -1625,7 +1625,7 @@ Channel-Binding TLV is defined as follows:
 
 M
 
-> 0 (Optional)
+> 0 - Optional TLV
 
 R
 
@@ -2419,7 +2419,7 @@ The Basic-Password-Auth-Resp TLV is defined as follows:
 
 M
 
-> 0 (Optional)
+> 0 - Optional TLV
 
 R
 

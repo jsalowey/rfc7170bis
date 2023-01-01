@@ -2374,7 +2374,7 @@ The Basic-Password-Auth-Req TLV is defined as follows:
 
 M
 
-> 0 (Optional)
+> Mandatory, set to one (1)
 
 R
 

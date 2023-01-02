@@ -571,13 +571,24 @@ method, first using machine credentials followed by a second instance
 using user credentials.
 
 EAP method messages are carried within EAP-Payload TLVs defined in
-[](#eap-payload-tlv).  Upon completion of each EAP method in the
-tunnel, the server MUST send an Intermediate-Result TLV
-indicating the result.  The peer MUST respond
-to the Intermediate-Result TLV indicating its result.  If the result
-indicates success, the Intermediate-Result TLV MUST be accompanied by
-a Crypto-Binding TLV.  The Crypto-Binding TLV is further discussed in
-[](#crypto-binding-tlv) and [](#computing-compound-mac).  The Intermediate-Result TLVs can be
+[](#eap-payload-tlv).  Note that in this use-case, TEAP is simply a
+carrier for EAP, much as RADIUS is a carrier for EAP.  The full EAP
+state machine is run as normal, and is carried over the EAP-Payload
+TLV.  Each distinct EAP authentication MUST be managed as a separate
+EAP state machine.
+
+A TEAP server therefore MUST begin an EAP authentication with an
+EAP-Request/Identity (carried in an EAP-Payload TLV).  However, a TEAP
+server MUST NOT finish the EAP conversation with an EAP Success or EAP
+Failure packet, the Intermediate-Result TLV is used instead.
+
+Upon completion of each EAP method in the tunnel, the server MUST send
+an Intermediate-Result TLV indicating the result.  The peer MUST
+respond to the Intermediate-Result TLV indicating its result.  If the
+result indicates success, the Intermediate-Result TLV MUST be
+accompanied by a Crypto-Binding TLV.  The Crypto-Binding TLV is
+further discussed in [](#crypto-binding-tlv) and
+[](#computing-compound-mac).  The Intermediate-Result TLVs can be
 included with other TLVs such as EAP-Payload TLVs starting a new EAP
 conversation or with the Result TLV used in the protected termination
 exchange.

@@ -4033,13 +4033,13 @@ method Y, the conversation will occur as follows:
                               <- Intermediate Result TLV (Success),
                                Crypto-Binding TLV (Request),
                                Identity-Type TLV,
-                               EAP Payload TLV [EAP-Type=Y],
+                              EAP-Payload-TLV[
+                              EAP-Request/Identity])
 
       // Next EAP conversation started after successful completion
          of previous method X.  The Intermediate-Result and Crypto-
          Binding TLVs are sent in next packet to minimize round
-         trips.  In this example, an identity request is not sent
-         before negotiating EAP-Type=Y.
+         trips.
 
       // Compound MAC calculated using keys generated from
          EAP method X and the TLS tunnel.

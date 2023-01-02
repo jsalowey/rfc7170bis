@@ -821,8 +821,8 @@ transport.  If there is a non-fatal error handling the inner method,
 instead of silently dropping the inner method request or response and
 not responding, the receiving side SHOULD use an Error TLV with error
 code Inner Method Error to indicate an error processing the current
-inner method.  The side receiving the Error TLV MAY decide to start a
-new inner method instead or send back a Result TLV to terminate the
+inner method.  The side receiving a non-fatal Error TLV MAY decide to start a
+new inner method instead or to send back a Result TLV to terminate the
 TEAP authentication session.
 
 If a server receives a Result TLV of failure with a fatal Error TLV,

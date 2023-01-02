@@ -550,17 +550,40 @@ been established successfully.  Phase 2 consists of a series of
 requests and responses encapsulated in TLV objects defined in
 [](#teap-tlv-format).  Phase 2 MUST always end with a Crypto-Binding TLV
 exchange described in [](#crypto-binding-tlv) and a protected termination
-exchange described in [](#protected-termination).  The TLV exchange may include
-the execution of zero or more EAP methods within the protected tunnel
-as described in [](#eap-sequences).  A server MAY proceed directly to the
-protected termination exchange if it does not wish to request further
-authentication from the peer.  However, the peer and server MUST NOT
-assume that either will skip inner EAP methods or other TLV
-exchanges, as the other peer might have a different security policy.
-The peer may have roamed to a network that requires conformance with
-a different authentication policy, or the peer may request the server
-take additional action (e.g., channel binding) through the use of the
-Request-Action TLV as defined in [](#request-action-tlv).
+exchange described in [](#protected-termination).
+
+The TLV exchange includes the execution of zero or more authentication
+methods within the protected tunnel as described in [](#eap-sequences)
+and [](#password-auth).  A server MAY proceed directly to the
+protected termination exchange, without performing any inner
+authentication if it does not wish to request further authentication
+from the peer.  A server MAY request one or more authentications
+within the protected tunnel.  After completion of each authentication,
+the server decides whether or not to begin another authentication, or
+to send a Result TLV.
+
+Implementations MUST support at least two sequential authentications,
+which allows both Machine and User authentication to be performed.
+Implementations SHOULD also limit the number of sequential
+authentications, as there is no reason to perform a large number of inner
+authentications in one TEAP conversation.
+
+However, the peer and server MUST NOT assume that either will skip
+inner authentication or other TLV exchanges, as the other peer might have
+a different security policy.  The peer may have roamed to a network
+that requires conformance with a different authentication policy, or
+the peer may request the server take additional action (e.g., channel
+binding) through the use of the Request-Action TLV as defined in
+[](#request-action-tlv).
+
+The completion of each inner authentication method is signalled by an
+Intermediate-Result TLV.  Where the Intermediate-Result TLV indicates
+failure, an Error TLV SHOULD also be included.  The
+Intermediate-Result TLV may be accompanied by another TLV indicating
+that the server wishes to perform a subsequent authentication.  When
+the authentication sequence completes, the server MUST send a Result
+TLV indicating success or failure instead of a TLV which carries an
+authentication method.
 
 ### EAP Sequences {#eap-sequences}
 
@@ -606,7 +629,7 @@ always imply a failure of the overall authentication.  If one
 authentication method fails, the server may attempt to authenticate
 the peer with a different method.
 
-### Optional Password Authentication
+### Optional Password Authentication {#password-auth}
 
 The use of EAP-FAST-GTC as defined in RFC 5421 {{RFC5421}} is NOT
 RECOMMENDED with TEAPv1 because EAP-FAST-GTC is not compliant with

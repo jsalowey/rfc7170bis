@@ -583,7 +583,7 @@ server MUST NOT finish the EAP conversation with an EAP Success or EAP
 Failure packet, the Intermediate-Result TLV is used instead.
 
 Upon completion of each EAP method in the tunnel, the server MUST send
-an Intermediate-Result TLV indicating the result.  The peer MUST
+an Intermediate-Result TLV indicating the result of the inner EAP method.  The peer MUST
 respond to the Intermediate-Result TLV indicating its result.  If the
 result indicates success, the Intermediate-Result TLV MUST be
 accompanied by a Crypto-Binding TLV.  The Crypto-Binding TLV is
@@ -1866,8 +1866,14 @@ TLVs
 
 The Intermediate-Result TLV signals
 intermediate Success and Failure messages for all inner authentication
-methods.  The Intermediate-Result TLV MUST be be used for all inner authentication methods.  An Intermediate-Result TLV indicating success
-MUST be accompanied by a Crypto-Binding TLV.  The optional TLVs
+methods.  The Intermediate-Result TLV MUST be be used for all inner authentication methods.
+
+An Intermediate-Result TLV indicating Success
+MUST be accompanied by a Crypto-Binding TLV.
+
+An Intermediate-Result TLV indicating Failure SHOULD be accompanied by an Error TLV which indicates why the authentication failed.
+
+The optional TLVs
 associated with this TLV are provided for future extensibility to
 provide hints about the current result.  The Intermediate-Result TLV
 is defined as follows:

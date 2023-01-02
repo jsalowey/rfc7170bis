@@ -61,7 +61,13 @@ informative:
      title: "Microsoft EAP CHAP Extensions"
      date: June 2007
      author:
-	name: Ryan Hurst and Ashwin Palekar
+       name: Ryan Hurst and Ashwin Palekar
+  MSCHAP:
+     title: "Master Session Key (MSK) Derivation"
+     author:
+       name: Microsoft Corporation
+     format:
+       TXT: https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-chap/5a860bf5-2aeb-485b-82ee-fac1e8e6b76f
   NIST-SP-800-57:
     title: "Recommendation for Key Management"
     date: July 2012
@@ -632,8 +638,8 @@ user is authenticated.
 
 ### EAP-MSCHAPv2
 
-If using EAP-MSCHAPv2 [KAMATH] as an inner method, the EAP-FAST-MSCHAPv2
-variant defined in Section 3.2.3 of {{RFC5422}} MUST be used.
+If using EAP-MSCHAPv2 {{KAMATH}} as an inner method, the EAP-FAST-MSCHAPv2
+variant defined in Section 3.2.3 of {{RFC5422}} MUST be used, instead of the derivation defined in {{MSCHAP}}.
 
 The difference between EAP-MSCHAPv2 and EAP-FAST-MSCHAPv2 is that the
 first and the second 16 octets of EAP-MSCHAPv2 MSK are swapped when it

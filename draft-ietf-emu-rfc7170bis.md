@@ -2819,7 +2819,7 @@ derivation.
 > "TEAPbindkey@ietf.org" consisting of the ASCII value for the
 > label "TEAPbindkey@ietf.org" (without quotes),  the seed
 > consists of the "\\0" null delimiter (0x00) and 2-octet unsigned
-> integer length in network byte order (0x00 \|| 0x4) specified
+> integer length in network byte order (0x00 \|| 0x40) specified
 > in [RFC5295].
 
 If an inner method does not support export of an Extended Master
@@ -2884,7 +2884,7 @@ of S-IMCK is as follows:
    S-IMCK[0] = session_key_seed
    For j = 1 to n-1 do
         IMCK[j] = TLS-PRF(S-IMCK[j-1],
-             "Inner Methods Compound Keys" \|\|
+             "Inner Methods Compound Keys" ||
              IMSK[j], 60)
         S-IMCK[j] = first 40 octets of IMCK[j]
         CMK[j] = last 20 octets of IMCK[j]

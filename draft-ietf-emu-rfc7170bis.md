@@ -2341,7 +2341,7 @@ TLV Type
 
 Length
 
-> 36 plus the length of included MAC fields
+> 76
 
 Reserved
 
@@ -2393,13 +2393,15 @@ Nonce
 
 EMSK Compound MAC
 
-> The computation of the MAC is described in [](#computing-compound-mac). This can be
-> the Server MAC (B1_MAC) or the Client MAC (B2_MAC).
+> The EMSK Compound MAC field is 20 octets.  This can be the Server
+> MAC (B1_MAC) or the Client MAC (B2_MAC).  The computation of the
+> MAC is described in [](#computing-compound-mac).
 
 MSK Compound MAC
 
-> The computation of the MAC is described in [](#computing-compound-mac). This can be
-> the Server MAC (B1_MAC) or the Client MAC (B2_MAC).
+> The MSK Compound MAC field is 20 octets.  This can be the Server
+> MAC (B1_MAC) or the Client MAC (B2_MAC).  The computation of the
+> MAC is described in [](#computing-compound-mac).
 
 ### Basic-Password-Auth-Req TLV {#bp-auth-req-tlv}
 

@@ -2283,8 +2283,12 @@ final Result TLV exchange, regardless of whether there is an inner
 authentication method or not.  It MUST be included with the
 Intermediate-Result TLV to perform cryptographic binding after each
 successful inner authentication in a sequence of authentication methods, before proceeding
-with another inner authentication method.  The Crypto-Binding TLV is valid only
-if the following checks pass:
+with another inner authentication method.  If no MSK or EMSK
+has been generated and a Crypto-Binding TLS is required then the MSK
+Compound MAC field contains the MAC using keys generated according
+to [](#computing-compound-mac).
+
+The Crypto-Binding TLV is valid only if the following checks pass:
 
 o  The Crypto-Binding TLV version is supported.
 

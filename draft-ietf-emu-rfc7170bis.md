@@ -50,6 +50,7 @@ normative:
   RFC5746:
   RFC5929:
   RFC6677:
+  RFC7170:
 
 informative:
   IEEE.802-1X.2013:
@@ -2958,6 +2959,15 @@ S-IMCK = session_key_seed.
 This section provides guidance to the Internet Assigned Numbers
 Authority (IANA) regarding registration of values related to the TEAP
 protocol, in accordance with BCP 26 {{RFC5226}}.
+
+IANA is instructed to update the references in the "Tunnel Extensible
+Authentication Protocol (TEAP) Parameters" registry to point to this
+document instead of to {{RFC7170}}
+
+IANA is instructed to add a "NOTE" at the beginning of the TEAP
+parameters registry which states:
+
+> The values in this registry were originally defined in {{RFC7170}}
 
 # Security Considerations
 

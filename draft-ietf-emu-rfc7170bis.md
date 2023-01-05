@@ -2875,7 +2875,7 @@ On the receiver of the Crypto-Binding TLV side:
 If no inner EAP authentication method is run then no EMSK or MSK
 will be generated (e.g. when basic password authentication
 is used or when no inner method has been run and the crypto-binding TLV
-for the Result-TLV needs to be generated).  In this case, IMSK[j]
+for the Result-TLV needs to be generated).  In this case, IMSK\[j]
 is set to zero (i.e., MSK = 32 octets of 0x00s).  If an inner method
 fails, then it is not included in this calculation.
 

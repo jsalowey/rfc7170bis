@@ -239,11 +239,17 @@ The network architectural model for TEAP usage is shown below:
 ~~~~
 {: title="TEAP Architectural Model"}
 
+The Peer and Authenticator are defined in Section 1.2 of {{RFC3748}}.
+The TEAP server is the "backend authentication server" defined in
+Section 1.2 of {{RFC3748}}.  The "Inner Method server" is usually part of the
+TEAP server, and handles the iapplication data (inner methods, EAP, passwords, etc.)
+inside of the TLS tunnel.
+
 The entities depicted above are logical entities and may or may not
 correspond to separate network components.  For example, the TEAP
-server and inner method server might be a single entity; the
+server and Inner Method server might be a single entity; the
 authenticator and TEAP server might be a single entity; or the
-functions of the authenticator, TEAP server, and inner method server
+functions of the authenticator, TEAP server, and Inner Method server
 might be combined into a single physical device.  For example,
 typical IEEE 802.11 deployments place the authenticator in an access
 point (AP) while a RADIUS server may provide the TEAP and inner
@@ -252,7 +258,7 @@ of labor among entities in a general manner and shows how a
 distributed system might be constructed; however, actual systems
 might be realized more simply.  The security considerations in
 [](#separation-p1-p2) provide an additional discussion of the implications of
-separating the TEAP server from the inner method server.
+separating the TEAP server from the Inner Method server.
 
 ## Protocol-Layering Model
 

@@ -2810,18 +2810,18 @@ length is 64 octets.  Optional data parameter is not used in the
 derivation.
 
 > IMSK = First 32 octets of TLS-PRF(EMSK, "TEAPbindkey@ietf.org",
-> 0x00 \|| 0x00 \|| 0x40)
+> 0x00 \| 0x00 \| 0x40)
 >
-> where "\||" denotes concatenation and the TLS-PRF is defined in
+> where "\|" denotes concatenation and the TLS-PRF is defined in
 > [RFC5246] as
 >
-> PRF(secret, label, seed) = P_\<hash>(secret, label \|| seed).
+> PRF(secret, label, seed) = P_\<hash>(secret, label \| seed).
 >
 > The secret is the EMSK from the inner method, the label is
 > "TEAPbindkey@ietf.org" consisting of the ASCII value for the
 > label "TEAPbindkey@ietf.org" (without quotes),  the seed
 > consists of the "\\0" null delimiter (0x00) and 2-octet unsigned
-> integer length in network byte order (0x00 \|| 0x40) specified
+> integer length in network byte order (0x00 \| 0x40) specified
 > in [RFC5295].
 
 If an inner method does not support export of an Extended Master
@@ -2886,13 +2886,13 @@ of S-IMCK is as follows:
    S-IMCK[0] = session_key_seed
    For j = 1 to n-1 do
         IMCK[j] = the first 60 octets of TLS-PRF(S-IMCK[j-1],
-             "Inner Methods Compound Keys" ||
+             "Inner Methods Compound Keys" |
              IMSK[j])
         S-IMCK[j] = first 40 octets of IMCK[j]
         CMK[j] = last 20 octets of IMCK[j]
 ~~~~
 
-where "\||" denotes concatenation, and TLS-PRF is the PRF negotiated as part of TLS handshake
+where "\|" denotes concatenation, and TLS-PRF is the PRF negotiated as part of TLS handshake
 {{RFC5246}}.
 
 ## Computing the Compound MAC {#computing-compound-mac}

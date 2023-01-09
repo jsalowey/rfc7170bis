@@ -2885,9 +2885,9 @@ of S-IMCK is as follows:
 ~~~~
    S-IMCK[0] = session_key_seed
    For j = 1 to n-1 do
-        IMCK[j] = TLS-PRF(S-IMCK[j-1],
+        IMCK[j] = the first 60 octets of TLS-PRF(S-IMCK[j-1],
              "Inner Methods Compound Keys" ||
-             IMSK[j], 60)
+             IMSK[j])
         S-IMCK[j] = first 40 octets of IMCK[j]
         CMK[j] = last 20 octets of IMCK[j]
 ~~~~
@@ -2953,15 +2953,23 @@ MSK and EMSK are generated as part of the IMCKn key hierarchy as
 follows:
 
 ~~~
-   MSK  = TLS-PRF(S-IMCK[j], "Session Key Generating Function", 64)
-   EMSK = TLS-PRF(S-IMCK[j],
-          "Extended Session Key Generating Function", 64)
+   MSK  = the first 64 octets of TLS-PRF(S-IMCK[j],
+          "Session Key Generating Function")
+   EMSK = the first 64 octets ofTLS-PRF(S-IMCK[j],
+          "Extended Session Key Generating Function")
 ~~~
 
-where j is the number of the last successfully executed inner EAP
-method.
+where "\|" denotes concatenation and the TLS-PRF is defined in
+{{RFC5246}} as
 
-TODO: rectify with 5.2
+~~~
+   PRF(secret, label, seed) = P_\<hash>(secret, label \| seed).
+~~~
+
+The secret is S-IMCK\[j] where j is the number of the last generated
+S-IMCK from [](#intermediate-compound-key).  The label is is the ASCII
+value for the string without quotes.  The seed is empty (0 length) and
+is omitted from the derivation.
 
 The EMSK is typically only known to the TEAP peer and server and is
 not provided to a third party.  The derivation of additional keys and

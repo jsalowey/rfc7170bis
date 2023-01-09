@@ -1,7 +1,7 @@
 ---
 title: Tunnel Extensible Authentication Protocol (TEAP) Version 1
 abbrev: TEAP
-docname: draft-ietf-emu-rfc7170bis-02
+docname: draft-ietf-emu-rfc7170bis-03
 
 stand_alone: true
 ipr: trust200902
@@ -127,7 +127,7 @@ secure communication between a peer and a server by using the
 Transport Layer Security (TLS) protocol to establish a mutually
 authenticated tunnel.  Within the tunnel, TLV objects are used to
 convey authentication-related data between the EAP peer and the EAP
-server.  This document obseletes RFC 7170.
+server.  This document obsoletes RFC 7170.
 
 --- middle
 
@@ -218,7 +218,6 @@ Phase 2 of TEAP.  The secret key used to resume the session in TEAP
 is referred to as the Protected Access Credential key (or PAC-Key).
 When the NewSessionTicket message is used to distribute the PAC-
 Opaque, the PAC-Key is the master secret for the session.  If TEAP
-
 Phase 2 is used to distribute the PAC-Opaque, then the PAC-Key is
 distributed along with the PAC-Opaque.  TEAP implementations MUST
 support the {{RFC5077}} mechanism for distributing a PAC-Opaque, and it
@@ -394,8 +393,8 @@ TLS ciphersuite:
 Other ciphersuites MAY be supported.  It is REQUIRED that anonymous
 ciphersuites such as TLS_DH_anon_WITH_AES_128_CBC_SHA {{RFC5246}} only
 be used in the case when the inner method provides
-mutual authentication, key generation, and resistance to man-in-the-
-middle and dictionary attacks.  TLS ciphersuites that do not provide
+mutual authentication, key generation, and resistance to man-in-the-middle
+and dictionary attacks.  TLS ciphersuites that do not provide
 confidentiality MUST NOT be used.  During the TEAP Phase 1
 conversation, the TEAP endpoints MAY negotiate TLS compression.
 During TLS tunnel establishment, TLS extensions MAY be used.  For
@@ -412,7 +411,6 @@ bit, the TEAP version as specified in [](#version-negotiation), and an authority
 identity TLV.  The TLS payload in the initial packet is empty.  The
 authority identity TLV (Authority-ID TLV) is used to provide the peer
 a hint of the server's identity that may be useful in helping the
-
 peer select the appropriate credential to use.  Assuming that the
 peer supports TEAP, the conversation continues with the peer sending
 an EAP-Response packet with EAP type of TEAP with the Start (S) bit
@@ -585,10 +583,18 @@ Implementations SHOULD also limit the number of sequential inner
 authentications, as there is no reason to perform a large number of inner
 authentications in one TEAP conversation.
 
+Implementations wishing to use their own proprietary authentication
+method, may substitute the EAP-Payload or Basic-Password-Auth-Req TLV
+for the Vendor-Specific TLV which carries another authentication
+method.  Any proprietary authentication method MUST support
+calculation of the Crypto-Binding TLV, and MUST use
+Intermediate-Result TLV and Result TLV as is done with other
+authentication methods.
+
 Implementations SHOULD support both inner EAP authentication methods
-and inner password authentication.  Implementations which support both
-EAP and password authentication MUST support those methods in any
-order or combination.  That is, it is explicitely permitted to "mix
+and inner password authentication.  Implementations which support
+multiple authentication methods MUST support those methods in any
+order or combination.  That is, it is explicitly permitted to "mix
 and match" inner methods.
 
 However, the peer and server MUST NOT assume that either will skip
@@ -637,7 +643,7 @@ Failure packet, the Intermediate-Result TLV is used instead.
 Upon completion of each EAP authentication in the tunnel, the server MUST send
 an Intermediate-Result TLV indicating the result of that authentication.  The peer MUST
 respond to the Intermediate-Result TLV indicating its result.  If the
-result indicates success, the Intermediate-Result TLV MUST be
+result indicates success, the servers Intermediate-Result TLV MUST be
 accompanied by a Crypto-Binding TLV.  The Crypto-Binding TLV is
 further discussed in [](#crypto-binding-tlv) and
 [](#computing-compound-mac).  The Intermediate-Result TLVs can be
@@ -784,14 +790,14 @@ unique from the Phase 1 outer tunnel at the beginning of Phase 2 as
 defined by Section 3.1 of {{RFC5929}}.  The Session-Id is defined as
 follows:
 
-> Session-Id = teap_type \|\| tls-unique
->
-> where teap_type is the EAP Type assigned to TEAP
+~~~~
+   Session-Id = teap_type \| tls-unique
+~~~~
+
+> where \| denotes concatenation, and teap_type is the EAP Type assigned to TEAP
 >
 > tls-unique = tls-unique from the Phase 1 outer tunnel at the
 > beginning of Phase 2 as defined by Section 3.1 of {{RFC5929}}
->
-> \|\| means concatenation
 
 ## Error Handling
 
@@ -961,10 +967,10 @@ certificate is the intended server.  Server authentication also
 results when the procedures in [](#phase1) are used to resume a
 session in which the peer and server were previously mutually
 authenticated.  Alternatively, peer services can be used if an inner
-EAP authentication method providing mutual authentication and an Extended Master
-Session Key (EMSK) is executed and cryptographic binding with the
-EMSK Compound Message Authentication Code (MAC) is correctly
-validated ([](#crypto-binding-tlv)).  This is further described in
+EAP method providing mutual authentication and an Master Session Key
+(MSK) and/or Extended Master Session Key (EMSK) that is executed and
+cryptographic binding with the Compound Message Authentication Code
+(MAC) which is correctly validated ([](#crypto-binding-tlv)).  This is further described in
 [](#unauth-provisioning).
 
 An additional complication arises when an inner method authenticates
@@ -985,20 +991,21 @@ in [](#pac-tlv-format) containing a PAC Attribute as defined in
 [](#pac-attr-format) of PAC-Type set to the appropriate value.  The peer
 MUST successfully authenticate the EAP server and validate the
 Crypto-Binding TLV as defined in [](#crypto-binding-tlv) before issuing the
-request.  The peer MUST send separate PAC TLVs for each type of PAC
-it wants to be provisioned.  Multiple PAC TLVs can be sent in the
-same packet or in different packets.  The EAP server will send the
-PACs after its internal policy has been satisfied, or it MAY ignore
-the request or request additional authentications if its policy
-dictates.  The server MAY cache the request and provision the PACs
-requested after all of its internal policies have been satisfied.  If
-a peer receives a PAC with an unknown type, it MUST ignore it.
-A PAC TLV containing a PAC-Acknowledge attribute MUST be sent by the
-peer to acknowledge the receipt of the Tunnel PAC.  A PAC TLV
-containing a PAC-Acknowledge attribute MUST NOT be used by the peer
-to acknowledge the receipt of other types of PACs.  If the peer
-receives a PAC TLV with an unknown attribute, it SHOULD ignore the
-unknown attribute.
+request.
+
+The peer MAY only request a single Tunnel PAC it wants to be
+provisioned. Additional PAC TLVs MUST be ignored by the server. The
+EAP server will send the PAC after its internal policy has been
+satisfied, or it MAY ignore the request or request additional
+authentications if its policy dictates.  The server MAY cache the
+request and provision the PACs requested after all of its internal
+policies have been satisfied.  If a peer receives a PAC with an
+unknown type, it MUST ignore it.  A PAC TLV containing a
+PAC-Acknowledge attribute MUST be sent by the peer to acknowledge the
+receipt of the Tunnel PAC.  A PAC TLV containing a PAC-Acknowledge
+attribute MUST NOT be used by the peer to acknowledge the receipt of
+other types of PACs.  If the peer receives a PAC TLV with an unknown
+attribute, it SHOULD ignore the unknown attribute.
 
 ### Certificate Provisioning within the Tunnel {#cert-provisioning}
 
@@ -1075,7 +1082,7 @@ generated from contribution from both peers.  Phase 2 EAP authentication methods
 used in Server Unauthenticated Provisioning Mode MUST provide mutual
 authentication, provide key generation, and be resistant to
 dictionary attack.  Example inner methods include EAP-pwd {{RFC5931}}
-and EAP-EKE {{RFC6124}}.
+and EAP-EKE {{RFC6124}}, but not EAP-FAST-MSCHAPv2.
 
 ### Channel Binding
 
@@ -1409,7 +1416,7 @@ The Identity-Type TLV is defined as follows:
 
 M
 
-> 0 - Optional TLV
+> Mandatory, set to one (1)
 
 R
 
@@ -1511,7 +1518,7 @@ TLV Type
 
 Length
 
-> >=6
+> \>=6
 
 Vendor-Id
 
@@ -2308,7 +2315,7 @@ whether there is an inner authentication method or not.  It MUST be
 included with the Intermediate-Result TLV to perform cryptographic
 binding after each successful inner method in a sequence of inner
 methods, before proceeding with another inner method.  If no MSK or
-EMSK has been generated and a Crypto-Binding TLS is required then the
+EMSK has been generated and a Crypto-Binding TLV is required then the
 MSK Compound MAC field contains the MAC using keys generated according
 to [](#computing-compound-mac).
 
@@ -2451,7 +2458,7 @@ The Basic-Password-Auth-Req TLV is defined as follows:
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |   Prompt ....
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-~~~
+~~~~
 
 M
 
@@ -2500,7 +2507,7 @@ The Basic-Password-Auth-Resp TLV is defined as follows:
 
 M
 
-> 0 - Optional TLV
+> Mandatory, set to one (1)
 
 R
 
@@ -2689,7 +2696,7 @@ TLV Type
 
 Length
 
-> >=2 octets
+> \>=2 octets
 
 Credential-Format
 
@@ -2711,11 +2718,18 @@ Authentication TLVs, or an EAP Payload TLV with a Basic Password
 Authentication TLV within one single TEAP packet is not supported in
 this version and MUST NOT be sent.  If the peer or EAP server
 receives multiple EAP Payload TLVs, then it MUST terminate the
-connection with the Result TLV.  The order of TLVs in TEAP does not
-matter, except one should always process the Identity-Type TLV before
-processing the EAP TLV or Basic Password Authentication TLV as the
-Identity-Type TLV is a hint to the type of identity that is to be
-authenticated.
+connection with the Result TLV.  The order in which TLVs are encoded in a TEAP packet does not
+matter, however there is an order in which TLVs must be processed:
+
+1. Crypto-Binding-TLV
+2. Intermediate-Result-TLV
+3. Result-TLV
+4. Identity-Type TLV
+5. EAP-Payload TLV[Identity-Request] or Basic-Password-Auth-Req TLV
+
+That is, cryptographic binding is checked before any result is used,
+and identities are checked before proposing an authentication method, as the
+identity may influence the chosen authentication method.
 
 The following define the meaning of the table entries in the sections
 below:
@@ -2839,9 +2853,11 @@ If an inner method supports export of an Extended Master Session Key
 length is 64 octets.  Optional data parameter is not used in the
 derivation.
 
-> IMSK = First 32 octets of TLS-PRF(EMSK, "TEAPbindkey@ietf.org",
-> 0x00 \| 0x00 \| 0x40)
->
+~~~~
+    IMSK = First 32 octets of TLS-PRF(EMSK, "TEAPbindkey@ietf.org",
+           0x00 \| 0x00 \| 0x40)
+~~~~
+
 > where "\|" denotes concatenation and the TLS-PRF is defined in
 > [RFC5246] as
 >
@@ -3113,6 +3129,10 @@ If the inner method is deriving EMSK, then this threat is mitigated
 as TEAP utilizes the mutual crypto-binding based on EMSK as described
 in {{RFC7029}}.
 
+On the other hand, if the inner method is not deriving EMSK as with
+password authentication or unauthenticated provisioning, then this
+thread still exists.
+
 ## Mitigation of Known Vulnerabilities and Protocol Deficiencies
 
 TEAP addresses the known deficiencies and weaknesses in some EAP
@@ -3135,7 +3155,7 @@ o  Acknowledged success/failure indication
 
 o  Faster re-authentications through session resumption
 
-o  Mitigation of dictionary attacks
+o  Mitigation of offline dictionary attacks
 
 o  Mitigation of man-in-the-middle attacks
 
@@ -3150,7 +3170,7 @@ noted for TEAP as well.
 TEAP was designed with a focus on protected inner methods
 that typically rely on weak credentials, such as password-based
 secrets.  To that extent, the TEAP authentication mitigates several
-vulnerabilities, such as dictionary attacks, by protecting the weak
+vulnerabilities, such as offline dictionary attacks, by protecting the weak
 credential-based inner method.  The protection is based on
 strong cryptographic algorithms in TLS to provide message
 confidentiality and integrity.  The keys derived for the protection
@@ -3203,10 +3223,17 @@ Phase 2 instead of using TLS handshake renegotiation.
 
 TEAP was designed with a focus on protected inner methods
 that typically rely on weak credentials, such as password-based
-secrets.  TEAP mitigates dictionary attacks by allowing the
+secrets.  TEAP mitigates offline dictionary attacks by allowing the
 establishment of a mutually authenticated encrypted TLS tunnel
 providing confidentiality and integrity to protect the weak
 credential-based inner method.
+
+TEAP mitigates dictionary attacks by permitting inner methods such as
+EAP-pwd which are not vulnerable to dictionary attacks.
+
+TEAP implementations can mitigate against online "brute force"
+dictionary attempts by limiting the number of failed authentication
+attempts for a particular identity.
 
 ### Protection against Man-in-the-Middle Attacks
 
@@ -3354,7 +3381,7 @@ Key derivation:          Yes
 
 Key strength:            See Note 1 below.
 
-Dictionary attack prot.: Yes
+Dictionary attack prot.: See Note 2 below.
 
 Fast reconnect:          Yes
 
@@ -3392,6 +3419,11 @@ to provide 112-bit equivalent key strength:
       200                       8719                        383
       250                      14596                        482
 ~~~~
+
+2. TEAP protects against offline dictionary attacks when secure inner
+methods are used.  TEAP protects against online dictionary attacks by
+limiting the number of failed authentications for a particular
+identity.
 
 # Acknowledgements
 
@@ -3645,7 +3677,7 @@ changes are:
 1. The EAP method name has been changed from EAP-FAST to TEAP; this
 change thus requires that a new EAP Type be assigned.
 
-2. This version of TEAP MUST support TLS 1.2 {{RFC5246}}.
+2. This version of TEAP MUST support TLS 1.2 {{RFC5246}}.  TLS 1.1 and earlier MUST NOT be used with TEAP.
 
 3. The key derivation now makes use of TLS keying material exporters
 {{RFC5705}} and the PRF and hash function negotiated in TLS.  This
@@ -4103,19 +4135,19 @@ method Y, the conversation will occur as follows:
                               EAP-Payload-TLV[
                               EAP-Request/Identity])
 
-      // Next EAP conversation started after successful completion
-         of previous method X.  The Intermediate-Result and Crypto-
-         Binding TLVs are sent in next packet to minimize round
-         trips.
-
       // Compound MAC calculated using keys generated from
          EAP method X and the TLS tunnel.
 
+      // Next EAP conversation started (with EAP-Request/Identity) after successful completion
+         of previous method X.  The Intermediate-Result and Crypto-
+         Binding TLVs are sent in the next packet to minimize round
+         trips.
+
       Intermediate Result TLV (Success),
       Crypto-Binding TLV (Response),
-      EAP-Payload-TLV [EAP-Type=Y] ->
+      EAP-Payload-TLV [EAP-Response/Identity (MyID2)] ->
 
-             // Optional additional Y Method exchanges...
+             // Optional additional EAP method Y exchanges...
 
                              <- EAP Payload TLV [
                              EAP-Type=Y]

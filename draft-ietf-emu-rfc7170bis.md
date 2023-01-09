@@ -2418,12 +2418,20 @@ EMSK Compound MAC
 > The EMSK Compound MAC field is 20 octets.  This can be the Server
 > MAC (B1_MAC) or the Client MAC (B2_MAC).  The computation of the
 > MAC is described in [](#computing-compound-mac).
+>
+> Note that this field is always 20 octets in length.  Any larger
+> MAC is simply truncated.  All validations or comparisons MUST be done
+> on the truncated value.
 
 MSK Compound MAC
 
 > The MSK Compound MAC field is 20 octets.  This can be the Server
 > MAC (B1_MAC) or the Client MAC (B2_MAC).  The computation of the
 > MAC is described in [](#computing-compound-mac).
+>
+> Note that this field is always 20 octets in length.  Any larger
+> MAC is simply truncated.  All validations or comparisons MUST be done
+> on the truncated value.
 
 ### Basic-Password-Auth-Req TLV {#bp-auth-req-tlv}
 
@@ -2935,7 +2943,7 @@ The Compound MAC computation is as follows:
 
 ~~~~
    CMK = CMK[j]
-   Compound-MAC = MAC( CMK, BUFFER )
+   Compound-MAC = the first 20 octets of MAC( CMK, BUFFER )
 ~~~~
 
 where j is the number of the last successfully executed inner

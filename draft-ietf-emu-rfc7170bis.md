@@ -367,8 +367,11 @@ peers MUST exchange the TEAP version number received during version
 negotiation using the Crypto-Binding TLV described in [](#crypto-binding-tlv).
 The receiver of the Crypto-Binding TLV MUST verify that the version
 received in the Crypto-Binding TLV matches the version sent by the
-receiver in the TEAP version negotiation.  If the Crypto-Binding TLV
-fails to be validated, then it is a fatal error and is handled as
+receiver in the TEAP version negotiation.
+
+The Crypto-Binding TLV MUST be validated before any Intermediate-Result TLV
+or Result TLV is examined.  If the Crypto-Binding TLV fails to be
+validated for any reason, then it is a fatal error and is handled as
 described in [](#phase-2-errors).
 
 ## TEAP Authentication Phase 1: Tunnel Establishment
@@ -2299,14 +2302,14 @@ authentications.  It also provides verification of the TEAP type,
 version negotiated, and Outer TLVs exchanged before the TLS tunnel
 establishment.
 
-The Crypto-Binding TLV MUST be exchanged and verified before the
-final Result TLV exchange, regardless of whether there is an inner
-authentication method or not.  It MUST be included with the
-Intermediate-Result TLV to perform cryptographic binding after each
-successful inner method in a sequence of inner methods, before proceeding
-with another inner method.  If no MSK or EMSK
-has been generated and a Crypto-Binding TLS is required then the MSK
-Compound MAC field contains the MAC using keys generated according
+The Crypto-Binding TLV MUST be exchanged and validated before any
+Intermediate-Result or Result TLV value is examined, regardless of
+whether there is an inner authentication method or not.  It MUST be
+included with the Intermediate-Result TLV to perform cryptographic
+binding after each successful inner method in a sequence of inner
+methods, before proceeding with another inner method.  If no MSK or
+EMSK has been generated and a Crypto-Binding TLS is required then the
+MSK Compound MAC field contains the MAC using keys generated according
 to [](#computing-compound-mac).
 
 The Crypto-Binding TLV is valid only if the following checks pass:

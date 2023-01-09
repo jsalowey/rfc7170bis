@@ -189,6 +189,13 @@ Type-Length-Value (TLV)
 > The TEAP protocol utilizes objects in TLV format.  The TLV format
 > is defined in [](#teap-tlv-format).
 
+Inner method
+
+> An authentication method which is sent as application data inside
+> of a TLS exchange which is carried over TEAP.  The inner method
+> can be an EAP authentication method, a username / password
+> authentication, or a vendor-specific authentication method.
+
 # Protocol Overview
 
 TEAP authentication occurs in two phases after the initial EAP
@@ -271,7 +278,7 @@ between protocols:
 
 ~~~~
  +---------------------------------------------------------------+
- |       Inner EAP Method     |     Other TLV information        |
+ |         Inner method       |     Other TLV information        |
  |---------------------------------------------------------------|
  |                 TLV Encapsulation (TLVs)                      |
  |---------------------------------------------------------------|
@@ -383,7 +390,7 @@ TLS ciphersuite:
 
 Other ciphersuites MAY be supported.  It is REQUIRED that anonymous
 ciphersuites such as TLS_DH_anon_WITH_AES_128_CBC_SHA {{RFC5246}} only
-be used in the case when the inner authentication method provides
+be used in the case when the inner method provides
 mutual authentication, key generation, and resistance to man-in-the-
 middle and dictionary attacks.  TLS ciphersuites that do not provide
 confidentiality MUST NOT be used.  During the TEAP Phase 1
@@ -559,54 +566,60 @@ requests and responses encapsulated in TLV objects defined in
 exchange described in [](#crypto-binding-tlv) and a protected termination
 exchange described in [](#protected-termination).
 
-The TLV exchange includes the execution of zero or more authentication
-methods within the protected tunnel as described in [](#eap-sequences)
-and [](#password-auth).  A server MAY proceed directly to the
+The TLV exchange includes the execution of zero or more inner
+methods within the protected tunnel as described in [](#inner-eap)
+and [](inner-password).  A server MAY proceed directly to the
 protected termination exchange, without performing any inner
 authentication if it does not wish to request further authentication
 from the peer.  A server MAY request one or more authentications
-within the protected tunnel.  After completion of each authentication,
-the server decides whether or not to begin another authentication, or
+within the protected tunnel.  After completion of each inner method,
+the server decides whether or not to begin another inner method, or
 to send a Result TLV.
 
-Implementations MUST support at least two sequential authentications,
+Implementations MUST support at least two sequential inner methods,
 which allows both Machine and User authentication to be performed.
-Implementations SHOULD also limit the number of sequential
+Implementations SHOULD also limit the number of sequential inner
 authentications, as there is no reason to perform a large number of inner
 authentications in one TEAP conversation.
 
+Implementations SHOULD support both inner EAP authentication methods
+and inner password authentication.  Implementations which support both
+EAP and password authentication MUST support those methods in any
+order or combination.  That is, it is explicitely permitted to "mix
+and match" inner methods.
+
 However, the peer and server MUST NOT assume that either will skip
-inner authentication or other TLV exchanges, as the other peer might have
+inner methods or other TLV exchanges, as the other peer might have
 a different security policy.  The peer may have roamed to a network
 that requires conformance with a different authentication policy, or
 the peer may request the server take additional action (e.g., channel
 binding) through the use of the Request-Action TLV as defined in
 [](#request-action-tlv).
 
-The completion of each inner authentication method is signalled by an
+The completion of each inner method is signalled by an
 Intermediate-Result TLV.  Where the Intermediate-Result TLV indicates
 failure, an Error TLV SHOULD also be included.  The
 Intermediate-Result TLV may be accompanied by another TLV indicating
 that the server wishes to perform a subsequent authentication.  When
 the authentication sequence completes, the server MUST send a Result
 TLV indicating success or failure instead of a TLV which carries an
-authentication method.
+inner method.
 
-### EAP Sequences {#eap-sequences}
+### Inner EAP Authentication {#inner-eap}
 
 EAP {{RFC3748}} prohibits use of multiple authentication methods within
 a single EAP conversation in order to limit vulnerabilities to man-
 in-the-middle attacks.  TEAP addresses man-in-the-middle attacks
 through support for cryptographic protection of the inner EAP
-exchange and cryptographic binding of the inner authentication
-method(s) to the protected tunnel.  EAP methods are executed serially
+exchange and cryptographic binding of the inner EAP
+method(s) to the protected tunnel.  Inner EAP methods are executed serially
 in a sequence.  This version of TEAP does not support initiating
-multiple EAP methods simultaneously in parallel.  The methods need
+multiple inner EAP methods simultaneously in parallel.  The inner EAP methods need
 not be distinct.  For example, EAP-TLS could be run twice as an inner
 method, first using machine credentials followed by a second instance
 using user credentials.
 
-EAP method messages are carried within EAP-Payload TLVs defined in
+Inner EAP method messages are carried within EAP-Payload TLVs defined in
 [](#eap-payload-tlv).  Note that in this use-case, TEAP is simply a
 carrier for EAP, much as RADIUS is a carrier for EAP.  The full EAP
 state machine is run as normal, and is carried over the EAP-Payload
@@ -618,37 +631,39 @@ EAP-Request/Identity (carried in an EAP-Payload TLV).  However, a TEAP
 server MUST NOT finish the EAP conversation with an EAP Success or EAP
 Failure packet, the Intermediate-Result TLV is used instead.
 
-Upon completion of each EAP method in the tunnel, the server MUST send
-an Intermediate-Result TLV indicating the result of the inner EAP method.  The peer MUST
+Upon completion of each EAP authentication in the tunnel, the server MUST send
+an Intermediate-Result TLV indicating the result of that authentication.  The peer MUST
 respond to the Intermediate-Result TLV indicating its result.  If the
 result indicates success, the Intermediate-Result TLV MUST be
 accompanied by a Crypto-Binding TLV.  The Crypto-Binding TLV is
 further discussed in [](#crypto-binding-tlv) and
 [](#computing-compound-mac).  The Intermediate-Result TLVs can be
-included with other TLVs such as EAP-Payload TLVs starting a new EAP
-conversation or with the Result TLV used in the protected termination
+included with other TLVs which indicate a subsequent authentication,
+or with the Result TLV used in the protected termination
 exchange.
 
-If both peer and server indicate success, then the method is
-considered complete.  If either indicates failure, then the method is
-considered failed.  The result of failure of an EAP method does not
+If both peer and server indicate success, then the authentication is
+considered successful.  If either indicates failure, then the authentication is
+considered failed.  The result of failure of an EAP authentication does not
 always imply a failure of the overall authentication.  If one
 authentication method fails, the server may attempt to authenticate
-the peer with a different method.
+the peer with a different method (EAP or password).
 
-### Optional Password Authentication {#password-auth}
+### Inner Password Authentication {#inner-password}
 
-The use of EAP-FAST-GTC as defined in RFC 5421 {{RFC5421}} is NOT
-RECOMMENDED with TEAPv1 because EAP-FAST-GTC is not compliant with
-EAP-GTC defined in {{RFC3748}}.  Implementations should instead make
-use of the password authentication TLVs defined in this
-specification.  The authentication server initiates password
+The authentication server initiates password
 authentication by sending a Basic-Password-Auth-Req TLV defined in
 [](#bp-auth-req-tlv).  If the peer wishes to participate in password
 authentication, then it responds with a Basic-Password-Auth-Resp TLV
 as defined in Section 4.2.15 that contains the username and password.
 If it does not wish to perform password authentication, then it
 responds with a NAK TLV indicating the rejection of the Basic-Password-Auth-Req TLV.
+
+The use of EAP-FAST-GTC as defined in RFC 5421 {{RFC5421}} is NOT
+RECOMMENDED with TEAPv1 because EAP-FAST-GTC is not compliant with
+EAP-GTC defined in {{RFC3748}}.  Implementations should instead make
+use of the password authentication TLVs defined in this
+specification.
 
 Upon completion of password authentication in
 the tunnel, the server MUST send an Intermediate-Result TLV
@@ -668,7 +683,7 @@ user is authenticated.
 
 ### EAP-MSCHAPv2
 
-If using EAP-MSCHAPv2 {{KAMATH}} as an inner method, the EAP-FAST-MSCHAPv2
+If using EAP-MSCHAPv2 {{KAMATH}} as an inner EAP method, the EAP-FAST-MSCHAPv2
 variant defined in Section 3.2.3 of {{RFC5422}} MUST be used, instead of the derivation defined in {{MSCHAP}}.
 
 The difference between EAP-MSCHAPv2 and EAP-FAST-MSCHAPv2 is that the
@@ -693,10 +708,10 @@ authentications.  It also provides verification of the TEAP type,
 version negotiated, and Outer TLVs exchanged before the TLS tunnel
 establishment.  Except as noted below, the Crypto-Binding TLV MUST be exchanged and verified
 before the final Result TLV exchange, regardless of whether or not
-there is an inner EAP method authentication.  The Crypto-Binding TLV
+there is an inner EAP authentication method.  The Crypto-Binding TLV
 and Intermediate-Result TLV MUST be included to perform cryptographic
 binding after each successful authentication in a sequence of one or more
-inner authentications.  The server may send the final Result TLV along with an
+inner methods.  The server may send the final Result TLV along with an
 Intermediate-Result TLV and a Crypto-Binding TLV to indicate its
 intention to end the conversation.  If the peer requires nothing more
 from the server, it will respond with a Result TLV indicating success
@@ -751,8 +766,8 @@ certificate.  As noted in {{RFC5280}}:
       Where it is non-empty, the subject field MUST contain an X.500
       distinguished name (DN).
 
-If an inner EAP method is run, then the Peer-Id is obtained from the
-inner method.
+If an inner EAP authentication method is run, then the Peer-Id is obtained from that
+inner EAP authentication method.
 
 When the server uses an X.509 certificate to establish the TLS
 tunnel, the Server-Id is determined in a similar fashion as stated
@@ -786,9 +801,9 @@ TEAP uses the error-handling rules summarized below:
 in all phases of TEAP.
 
 3. The Intermediate-Result TLVs carry success or failure indications
-of the individual inner authentication methods in TEAP Phase 2.  Errors within the
+of the individual inner methods in TEAP Phase 2.  Errors within the
 EAP conversation in Phase 2 are expected to be handled by
-individual EAP methods.
+individual EAP authentication methods.
 
 4. Violations of the Inner TLV rules are handled using Result TLVs
 together with Error TLVs.
@@ -854,7 +869,7 @@ process the contents of the response message.
 For the inner method, retransmission is not needed and SHOULD NOT be
 attempted, as the Outer TLS tunnel can be considered a reliable
 transport.  If there is a non-fatal error handling the inner method,
-instead of silently dropping the inner method request or response and
+instead of silently dropping the inner method exchange and
 not responding, the receiving side SHOULD use an Error TLV with error
 code Inner Method Error to indicate an error processing the current
 inner method.  The side receiving a non-fatal Error TLV MAY decide to start a
@@ -943,13 +958,13 @@ certificate is the intended server.  Server authentication also
 results when the procedures in [](#phase1) are used to resume a
 session in which the peer and server were previously mutually
 authenticated.  Alternatively, peer services can be used if an inner
-EAP method providing mutual authentication and an Extended Master
+EAP authentication method providing mutual authentication and an Extended Master
 Session Key (EMSK) is executed and cryptographic binding with the
 EMSK Compound Message Authentication Code (MAC) is correctly
 validated ([](#crypto-binding-tlv)).  This is further described in
 [](#unauth-provisioning).
 
-An additional complication arises when a tunnel method authenticates
+An additional complication arises when an inner method authenticates
 multiple parties such as authenticating both the peer machine and the
 peer user to the EAP server.  Depending on how authentication is
 achieved, only some of these parties may have confidence in it.  For
@@ -1044,7 +1059,7 @@ negotiated does not provide authentication and in which the
 ciphersuite negotiated provides the authentication but the peer is
 unable to validate the identity of the server for some reason.
 
-Upon successful completion of the EAP method in Phase 2, the peer and
+Upon successful completion of the EAP authentication method in Phase 2, the peer and
 server exchange a Crypto-Binding TLV to bind the inner method with
 the outer tunnel and ensure that a man-in-the-middle attack has not
 been attempted.
@@ -1053,7 +1068,7 @@ Support for the Server Unauthenticated Provisioning Mode is optional.
 The ciphersuite TLS_DH_anon_WITH_AES_128_CBC_SHA is RECOMMENDED when
 using Server Unauthenticated Provisioning Mode, but other anonymous
 ciphersuites MAY be supported as long as the TLS pre-master secret is
-generated from contribution from both peers.  Phase 2 EAP methods
+generated from contribution from both peers.  Phase 2 EAP authentication methods
 used in Server Unauthenticated Provisioning Mode MUST provide mutual
 authentication, provide key generation, and be resistant to
 dictionary attack.  Example inner methods include EAP-pwd {{RFC5931}}
@@ -1065,7 +1080,7 @@ and EAP-EKE {{RFC6124}}.
 the "lying provider" problems, using a process in which the EAP peer
 gives information about the characteristics of the service provided
 by the authenticator to the Authentication, Authorization, and
-Accounting (AAA) server protected within the EAP method.  This allows
+Accounting (AAA) server protected within the EAP authentication method.  This allows
 the server to verify the authenticator is providing information to
 the peer that is consistent with the information received from this
 authenticator as well as the information stored about this
@@ -1756,7 +1771,7 @@ Vendor TLVs
 
 The Request-Action TLV MAY be sent by both the peer and the server in
 response to a successful or failed Result TLV.  It allows the peer or
-server to request the other side to negotiate additional EAP methods
+server to request the other side to negotiate additional inner methods
 or process TLVs specified in the response packet.  The receiving side
 MUST process this TLV.  The processing for the TLV is as follows:
 
@@ -1777,7 +1792,7 @@ MUST process this TLV.  The processing for the TLV is as follows:
 > TLV is not understood by the receiving entity, then it should be
 > treated as a fatal error.
 >
-> After processing the TLVs or EAP method in the request, another
+> After processing the TLVs or inner method in the request, another
 > round of Result TLV exchange would occur to synchronize the final
 > status on both sides.
 
@@ -1901,8 +1916,8 @@ TLVs
 ### Intermediate-Result TLV {#intermediate-result-tlv}
 
 The Intermediate-Result TLV signals
-intermediate Success and Failure messages for all inner authentication
-methods.  The Intermediate-Result TLV MUST be be used for all inner authentication methods.
+intermediate Success and Failure messages for all inner
+methods.  The Intermediate-Result TLV MUST be be used for all inner methods.
 
 An Intermediate-Result TLV indicating Success
 MUST be accompanied by a Crypto-Binding TLV.
@@ -2184,12 +2199,12 @@ Attributes
 >> Initiator Identifier (I-ID) is the peer identity associated
 >> with the credential.  This identity is derived from the inner
 >> authentication or from the client-side authentication during
->> tunnel establishment if inner authentication is not used.  The
+>> tunnel establishment if an inner method is not used.  The
 >> server employs the I-ID in the TEAP Phase 2 conversation to
 >> validate that the same peer identity used to execute TEAP Phase
->> 1 is also used in at minimum one inner authentication in TEAP
+>> 1 is also used in at minimum one inner methods in TEAP
 >> Phase 2.  If the server is enforcing the I-ID validation on the
->> inner authentication, then the I-ID MUST be included in the
+>> inner method, then the I-ID MUST be included in the
 >> PAC-Info, to enable the peer to also enforce a unique PAC for
 >> each unique user.  If the I-ID is missing from the PAC-Info, it
 >> is assumed that the Tunnel PAC can be used for multiple users
@@ -2288,8 +2303,8 @@ The Crypto-Binding TLV MUST be exchanged and verified before the
 final Result TLV exchange, regardless of whether there is an inner
 authentication method or not.  It MUST be included with the
 Intermediate-Result TLV to perform cryptographic binding after each
-successful inner authentication in a sequence of authentication methods, before proceeding
-with another inner authentication method.  If no MSK or EMSK
+successful inner method in a sequence of inner methods, before proceeding
+with another inner method.  If no MSK or EMSK
 has been generated and a Crypto-Binding TLS is required then the MSK
 Compound MAC field contains the MAC using keys generated according
 to [](#computing-compound-mac).
@@ -2377,8 +2392,6 @@ Flags
 >> 2  MSK Compound MAC is present
 >>
 >> 3  Both EMSK and MSK Compound MAC are present
->>
->> TODO: What if there is just Basic-Password-Auth, and no EAP method?
 
 Sub-Type
 
@@ -2803,7 +2816,7 @@ the IMCK MUST be recalculated after each successful inner EAP method.
 The first step in these calculations is the generation of the base
 compound key, IMCK\[j] from the session_key_seed, and any session keys
 derived from the successful execution of jth inner EAP authentication
-methods or basic password authentication. The inner EAP method(s) may
+methods or basic password authentication. The inner EAP authentication method(s) may
 provide Inner Method Session Keys (IMSKs), IMSK1..IMSKn, corresponding
 to inner method 1 through n.  When the jth exchange, such as a basic
 password exchange, does not derive key material then a special 0 IMSK
@@ -2903,7 +2916,7 @@ where "\|" denotes concatenation, and TLS-PRF is the PRF negotiated as part of T
 
 ## Computing the Compound MAC {#computing-compound-mac}
 
-For authentication methods that generate keying material, further
+For inner methods that generate keying material, further
 protection against man-in-the-middle attacks is provided through
 cryptographically binding keying material established by both TEAP
 Phase 1 and TEAP Phase 2 conversations.  After each successful inner
@@ -2922,7 +2935,7 @@ The Compound MAC computation is as follows:
    Compound-MAC = MAC( CMK, BUFFER )
 ~~~~
 
-where j is the number of the last successfully executed inner EAP
+where j is the number of the last successfully executed inner
 method, MAC is the MAC function negotiated in TLS (e.g. TLS 1.2 in {{RFC5246}}), and
 BUFFER is created after concatenating these fields in the following
 order:
@@ -2950,11 +2963,11 @@ and therefore the IMSK is set to 0 (e.g., MSK = 32 octets of 0x00s).
 ## EAP Master Session Key Generation
 
 TEAP authentication assures the Master Session Key (MSK) and Extended
-Master Session Key (EMSK) output from the EAP method are the result
+Master Session Key (EMSK) output from the EAP authentication method are the result
 of all authentication conversations by generating an Intermediate
 Compound Key (IMCK).  The IMCK is mutually derived by the peer and
 the server as described in [](#intermediate-compound-key) by combining the MSKs from
-inner authentication methods with key material from TEAP Phase 1.  The resulting
+inner methods with key material from TEAP Phase 1.  The resulting
 MSK and EMSK are generated as part of the IMCKn key hierarchy as
 follows:
 
@@ -2982,8 +2995,8 @@ not provided to a third party.  The derivation of additional keys and
 transportation of these keys to a third party are outside the scope
 of this document.
 
-If no EAP methods have been negotiated inside the tunnel or no EAP
-methods have been successfully completed inside the tunnel, the MSK
+If no EAP authentication methods have been negotiated inside the tunnel or no EAP
+authentication methods have been successfully completed inside the tunnel, the MSK
 and EMSK will be generated directly from the session_key_seed meaning
 S-IMCK = session_key_seed.
 
@@ -3016,11 +3029,11 @@ is defined in EAP {{RFC3748}}.
 ## Mutual Authentication and Integrity Protection
 
 As a whole, TEAP provides message and integrity protection by
-establishing a secure tunnel for protecting the authentication
+establishing a secure tunnel for protecting the inner
 method(s).  The confidentiality and integrity protection is defined
 by TLS and provides the same security strengths afforded by TLS
 employing a strong entropy shared master secret.  The integrity of
-the key generating authentication methods executed within the TEAP
+the key generating inner methods executed within the TEAP
 tunnel is verified through the calculation of the Crypto-Binding TLV.
 This ensures that the tunnel endpoints are the same as the inner
 method endpoints.
@@ -3038,7 +3051,7 @@ Result TLV.
 ## Method Negotiation
 
 As is true for any negotiated EAP protocol, NAK packets used to
-suggest an alternate authentication method are sent unprotected and,
+suggest an alternate EAP authentication method are sent unprotected and,
 as such, are subject to spoofing.  During unprotected EAP method
 negotiation, NAK packets may be interjected as active attacks to
 negotiate down to a weaker form of authentication, such as EAP-MD5
@@ -3048,9 +3061,9 @@ that prevents them from negotiating down to weaker methods.  Inner
 method negotiation resists attacks because it is protected by the
 mutually authenticated TLS tunnel established.  Selection of TEAP as
 an authentication method does not limit the potential inner
-authentication methods, so TEAP should be selected when available.
+methods, so TEAP should be selected when available.
 
-An attacker cannot readily determine the inner EAP method used,
+An attacker cannot readily determine the inner method used,
 except perhaps by traffic analysis.  It is also important that peer
 implementations limit the use of credentials with an unauthenticated
 or unauthorized server.
@@ -3081,8 +3094,8 @@ without end-to-end protection of TEAP MAY be used.  The TEAP
 encrypting/decrypting gateway MUST, at a minimum, provide support for
 IPsec, TLS, or similar protection in order to provide confidentiality
 for the portion of the conversation between the gateway and the EAP
-server.  In addition, separation of the inner and outer method
-servers allows for crypto-binding based on the inner method MSK to be
+server.  In addition, separation of the TEAP server and Inner servers
+allows for crypto-binding based on the inner method MSK to be
 thwarted as described in {{RFC7029}}.  Implementation and deployment
 SHOULD adopt various mitigation strategies described in {{RFC7029}}.
 If the inner method is deriving EMSK, then this threat is mitigated
@@ -3091,8 +3104,8 @@ in {{RFC7029}}.
 
 ## Mitigation of Known Vulnerabilities and Protocol Deficiencies
 
-TEAP addresses the known deficiencies and weaknesses in the EAP
-method.  By employing a shared secret between the peer and server to
+TEAP addresses the known deficiencies and weaknesses in some EAP
+authentication methods.  By employing a shared secret between the peer and server to
 establish a secured tunnel, TEAP enables:
 
 o  Per-packet confidentiality and integrity protection
@@ -3101,9 +3114,9 @@ o  User identity protection
 
 o  Better support for notification messages
 
-o  Protected EAP inner method negotiation
+o  Protected inner method negotiation, including EAP method
 
-o  Sequencing of EAP methods
+o  Sequencing of inner methods, including EAP methods
 
 o  Strong mutually derived MSKs
 
@@ -3123,11 +3136,11 @@ sending erroneous traffic to disrupt the protocol.  This is a problem
 in many authentication or key agreement protocols and is therefore
 noted for TEAP as well.
 
-TEAP was designed with a focus on protected authentication methods
+TEAP was designed with a focus on protected inner methods
 that typically rely on weak credentials, such as password-based
 secrets.  To that extent, the TEAP authentication mitigates several
 vulnerabilities, such as dictionary attacks, by protecting the weak
-credential-based authentication method.  The protection is based on
+credential-based inner method.  The protection is based on
 strong cryptographic algorithms in TLS to provide message
 confidentiality and integrity.  The keys derived for the protection
 relies on strong random challenges provided by both peer and server
@@ -3172,36 +3185,36 @@ The peer replies with certificate, client_key_exchange, and
 certificate_verify messages.  Since this renegotiation occurs within
 the encrypted TLS channel, it does not reveal client certificate
 details.  It is possible to perform certificate authentication using
-an EAP method (for example, EAP-TLS) within the TLS session in TEAP
+an EAP authentication method (for example, EAP-TLS) within the TLS session in TEAP
 Phase 2 instead of using TLS handshake renegotiation.
 
 ### Dictionary Attack Resistance
 
-TEAP was designed with a focus on protected authentication methods
+TEAP was designed with a focus on protected inner methods
 that typically rely on weak credentials, such as password-based
 secrets.  TEAP mitigates dictionary attacks by allowing the
 establishment of a mutually authenticated encrypted TLS tunnel
 providing confidentiality and integrity to protect the weak
-credential-based authentication method.
+credential-based inner method.
 
 ### Protection against Man-in-the-Middle Attacks
 
-Allowing methods to be executed both with and without the protection
+Allowing authentication methods to be executed both with and without the protection
 of a secure tunnel opens up a possibility of a man-in-the-middle
 attack.  To avoid man-in-the-middle attacks it is recommended to
 always deploy authentication methods with the protection of TEAP.
 TEAP provides protection from man-in-the-middle attacks even if a
-deployment chooses to execute inner EAP methods both with and without
+deployment chooses to execute inner methods both with and without
 TEAP protection.  TEAP prevents this attack in two ways:
 
 1. By using the PAC-Key to mutually authenticate the peer and server
 during TEAP authentication Phase 1 establishment of a secure
 tunnel.
 
-2.  By using the keys generated by the inner authentication method
+2.  By using the keys generated by the inner method
 (if the inner methods are key generating) in the crypto-binding
 exchange and in the generation of the key material exported by
-the EAP method described in [](#cryptographic-calculations).
+the EAP authentication method described in [](#cryptographic-calculations).
 
 TEAP crypto binding does not guarantee man-in-the-middle protection
 if the client allows a connection to an untrusted server, such as in
@@ -3222,7 +3235,7 @@ in the conversation if a strong inner method is used.
 A PAC may be bound to a user identity.  A compliant implementation of
 TEAP MUST validate that an identity obtained in the PAC-Opaque field
 matches at minimum one of the identities provided in the TEAP Phase 2
-authentication method.  This validation provides another binding to
+inner method.  This validation provides another binding to
 ensure that the intended peer (based on identity) has successfully
 completed the TEAP Phase 1 and proved identity in the Phase 2
 conversations.
@@ -3587,7 +3600,7 @@ negotiation within the protected TLS tunnel.
 {:numbered="false"}
 
 TEAPv1 meets this requirement by supporting inner EAP method chaining
-within protected TLS tunnels as defined in [](#eap-sequences).
+within protected TLS tunnels as defined in [](#inner-eap).
 
 ## A.27.  Requirement 4.6.3: Cryptographic Binding with the TLS Tunnel
 {:numbered="false"}

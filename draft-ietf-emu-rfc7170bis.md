@@ -1084,6 +1084,24 @@ authentication, provide key generation, and be resistant to
 dictionary attack.  Example inner methods include EAP-pwd {{RFC5931}}
 and EAP-EKE {{RFC6124}}, but not EAP-FAST-MSCHAPv2.
 
+When a strong inner method is not used with Server Unauthenticated
+Provisioning Mode, it is possible for an attacker to perform a
+man-in-the-middle attack.  In effect, Server Unauthenticated
+Provisioning Mode has similar security issues as just running the
+inner method in the open, without the protection of TLS.  All of the
+information in the tunnel should be assumed to be visible to, and
+modifiable by, an attacker.
+
+Implementations SHOULD exchange minimal data in Server
+Unauthenticated Provisioning Mode.  Instead, they should use that mode
+to set up a secure / authenticated tunnel, and then use that tunnel to
+perform any needed data exchange.
+
+It is RECOMMENDED that client implementations and deployments
+authenticate TEAP servers if at all possible.  Authenticating the
+server means that a PAC can be provisioned securely with no chance of
+an attacker eaves-dropping on the connection.
+
 ### Channel Binding
 
 {{RFC6677}} defines EAP channel bindings to solve the "lying NAS" and

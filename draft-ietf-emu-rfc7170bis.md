@@ -2719,13 +2719,14 @@ Authentication TLV within one single TEAP packet is not supported in
 this version and MUST NOT be sent.  If the peer or EAP server
 receives multiple EAP Payload TLVs, then it MUST terminate the
 connection with the Result TLV.  The order in which TLVs are encoded in a TEAP packet does not
-matter, however there is an order in which TLVs must be processed:
+matter, however there is an order in which TLVs in a packet must be processed:
 
 1. Crypto-Binding-TLV
 2. Intermediate-Result-TLV
-3. Result-TLV
+3. Result-TLV or Request-Action TLV
 4. Identity-Type TLV
 5. EAP-Payload TLV[Identity-Request] or Basic-Password-Auth-Req TLV
+6. Other TLVs
 
 That is, cryptographic binding is checked before any result is used,
 and identities are checked before proposing an authentication method, as the

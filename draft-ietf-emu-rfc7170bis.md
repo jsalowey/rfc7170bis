@@ -1735,6 +1735,11 @@ needs to recognize the vendor ID, parse all Vendor TLVs within, and
 deal with error handling within the Vendor-Specific TLV as defined by
 the vendor.
 
+Where a Vendor-Specific TLV carries an authentication protocol in the
+inner method, it MUST define values for MSK and EMSK.  Where these
+values cannot be derived from cryptographic primitives, they MUST be
+set to zero, as happens when Basic-Password-Auth-Req is used.
+
 The Vendor-Specific TLV is defined as follows:
 
 ~~~~
@@ -2819,10 +2824,14 @@ If a PAC is used, then the master secret is obtained as described in
 {{RFC5077}}.
 
 TEAPv1 makes use of the TLS Keying Material Exporters defined in
-{{RFC5705}} to derive the session_key_seed.  The label used in the
-derivation is "EXPORTER: teap session key seed".  The length of the
-session key seed material is 40 octets.  No context data is used in
-the export process.
+{{RFC5705}} to derive the session_key_seed as follows:
+
+~~~~
+   session_key_seed = TLS-Exporter(
+                      "EXPORTER: teap session key seed",, 40)
+~~~~
+
+No context data is used in the export process.
 
 The session_key_seed is used by the TEAP authentication Phase 2
 conversation to both cryptographically bind the inner method(s) to
@@ -2837,15 +2846,15 @@ Phase 2 to generate an Intermediate Compound Key (IMCK) used to
 verify the integrity of the TLS tunnel after each successful inner
 authentication and in the generation of Master Session Key (MSK) and
 Extended Master Session Key (EMSK) defined in {{RFC3748}}.  Note that
-the IMCK MUST be recalculated after each successful inner EAP method.
+the IMCK MUST be recalculated after each successful inner method.
 
 The first step in these calculations is the generation of the base
 compound key, IMCK\[j] from the session_key_seed, and any session keys
-derived from the successful execution of jth inner EAP authentication
-methods or basic password authentication. The inner EAP authentication method(s) may
+derived from the successful execution of jth inner
+methodsn. The inner method(s) MUST
 provide Inner Method Session Keys (IMSKs), IMSK1..IMSKn, corresponding
-to inner method 1 through n.  When the jth exchange, such as a basic
-password exchange, does not derive key material then a special 0 IMSK
+to inner method 1 through n.  When a particular authentication method
+does not provide key material (such as with password exchange) then a special "all zero" IMSK
 is used as described below.
 
 If an inner method supports export of an Extended Master Session Key
@@ -2855,7 +2864,7 @@ length is 64 octets.  Optional data parameter is not used in the
 derivation.
 
 ~~~~
-    IMSK = First 32 octets of TLS-PRF(EMSK, "TEAPbindkey@ietf.org",
+    IMSK[j] = First 32 octets of TLS-PRF(EMSK[j], "TEAPbindkey@ietf.org",
            0x00 \| 0x00 \| 0x40)
 ~~~~
 
@@ -2864,7 +2873,7 @@ derivation.
 >
 > PRF(secret, label, seed) = P_\<hash>(secret, label \| seed).
 >
-> The secret is the EMSK from the inner method, the label is
+> The secret is the EMSK or MSK from the inner method, the label is
 > "TEAPbindkey@ietf.org" consisting of the ASCII value for the
 > label "TEAPbindkey@ietf.org" (without quotes),  the seed
 > consists of the "\\0" null delimiter (0x00) and 2-octet unsigned
@@ -2877,7 +2886,7 @@ MSK is truncated at 32 octets if it is longer than 32 octets or
 padded to a length of 32 octets with zeros if it is less than 32
 octets.
 
-However, it's possible that the peer and server sides might not have
+However, it is possible that the peer and server sides might not have
 the same capability to export EMSK.  In order to maintain maximum
 flexibility while prevent downgrading attack, the following mechanism
 is in place.
@@ -2924,10 +2933,9 @@ will be generated (e.g. when basic password authentication
 is used or when no inner method has been run and the crypto-binding TLV
 for the Result-TLV needs to be generated).  In this case, IMSK\[j]
 is set to zero (i.e., MSK = 32 octets of 0x00s).  If an inner method
-fails, then it is not included in this calculation.
+results in failure, then it is not included in this calculation.
 
-The derivation
-of S-IMCK is as follows:
+The derivation of S-IMCK is as follows:
 
 ~~~~
    S-IMCK[0] = session_key_seed
@@ -2941,6 +2949,25 @@ of S-IMCK is as follows:
 
 where "\|" denotes concatenation, and TLS-PRF is the PRF negotiated as part of TLS handshake
 {{RFC5246}}.
+
+In practice, the requirement to use either MSK or EMSK means that an
+implement MUST track two independent derivations of IMCK[j], one which
+depends on the MSK, and another which depends on EMSK.  That is, we
+have both values derived from MSK:
+
+~~~~
+   IMSK_MSK[j]
+   S-IMCK_MSK[j]
+   CMK_MSK[j]
+~~~~
+
+and then also values derived from EMSK:
+
+~~~~
+   IMSK_EMSK[j]
+   S-IMCK_EMSK[j]
+   CMK_EMSK[j]
+~~~~
 
 ## Computing the Compound MAC {#computing-compound-mac}
 
@@ -2959,8 +2986,7 @@ the MAC field is filled with zeros.
 The Compound MAC computation is as follows:
 
 ~~~~
-   CMK = CMK[j]
-   Compound-MAC = the first 20 octets of MAC( CMK, BUFFER )
+   Compound-MAC = the first 20 octets of MAC( CMK[j], BUFFER )
 ~~~~
 
 where j is the number of the last successfully executed inner
@@ -2996,13 +3022,13 @@ of all authentication conversations by generating an Intermediate
 Compound Key (IMCK).  The IMCK is mutually derived by the peer and
 the server as described in [](#intermediate-compound-key) by combining the MSKs from
 inner methods with key material from TEAP Phase 1.  The resulting
-MSK and EMSK are generated as part of the IMCKn key hierarchy as
-follows:
+MSK and EMSK are generated from the final ("n"th) inner method, as part of the IMCK\[n] key hierarchy via the
+following derivation:
 
 ~~~
-   MSK  = the first 64 octets of TLS-PRF(S-IMCK[j],
+   MSK  = the first 64 octets of TLS-PRF(S-IMCK[n],
           "Session Key Generating Function")
-   EMSK = the first 64 octets ofTLS-PRF(S-IMCK[j],
+   EMSK = the first 64 octets ofTLS-PRF(S-IMCK[n],
           "Extended Session Key Generating Function")
 ~~~
 
@@ -3013,8 +3039,8 @@ where "\|" denotes concatenation and the TLS-PRF is defined in
    PRF(secret, label, seed) = P_\<hash>(secret, label \| seed).
 ~~~
 
-The secret is S-IMCK\[j] where j is the number of the last generated
-S-IMCK from [](#intermediate-compound-key).  The label is is the ASCII
+The secret is S-IMCK\[n] where n is the number of the last generated
+S-IMCK\[j] from [](#intermediate-compound-key).  The label is is the ASCII
 value for the string without quotes.  The seed is empty (0 length) and
 is omitted from the derivation.
 
@@ -3026,7 +3052,16 @@ of this document.
 If no EAP authentication methods have been negotiated inside the tunnel or no EAP
 authentication methods have been successfully completed inside the tunnel, the MSK
 and EMSK will be generated directly from the session_key_seed meaning
-S-IMCK = session_key_seed.
+S-IMCK\[0] = session_key_seed.
+
+As we noted above, not all inner methods generate both MSK and EMSK,
+so we have to maintain two independent derivations of S-IMCK\[j], one
+for each of MSK\[j] and EMSK\[j].  The final derivation using
+S-IMCK\[n] must choose only one of these keys.
+
+If the Crypto-Binding TLV contains an EMSK compound MAC, then the
+derivation is taken from the S_IMCK_EMSK[n].  Otherwise it is taken
+from the S_IMCK_MSK[n].
 
 # IANA Considerations
 

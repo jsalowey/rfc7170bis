@@ -2959,6 +2959,7 @@ The derivation of S-IMCK is as follows:
 
 ~~~~
    S-IMCK[0] = session_key_seed
+   CMK[0] = last 20 octets of IMCK[0]
    For j = 1 to n-1 do
         IMCK[j] = the first 60 octets of TLS-PRF(S-IMCK[j-1],
              "Inner Methods Compound Keys" |

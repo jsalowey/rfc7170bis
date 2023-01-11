@@ -2882,7 +2882,7 @@ length is 64 octets.  Optional data parameter is not used in the
 derivation.
 
 ~~~~
-    IMSK[j] = First 32 octets of TLS-PRF(EMSK[j], "TEAPbindkey@ietf.org",
+    IMSK[j] = First 32 octets of TLS-PRF(secret, "TEAPbindkey@ietf.org",
            0x00 \| 0x00 \| 0x40)
 ~~~~
 
@@ -2891,18 +2891,24 @@ derivation.
 >
 > PRF(secret, label, seed) = P_\<hash>(secret, label \| seed).
 >
-> The secret is the EMSK or MSK from the inner method, the label is
+> The secret is the EMSK or MSK from the j'th inner method, the label is
 > "TEAPbindkey@ietf.org" consisting of the ASCII value for the
 > label "TEAPbindkey@ietf.org" (without quotes),  the seed
 > consists of the "\\0" null delimiter (0x00) and 2-octet unsigned
 > integer length in network byte order (0x00 \| 0x40) specified
 > in [RFC5295].
-
-If an inner method does not support export of an Extended Master
-Session Key (EMSK), then the IMSK MUST be derived from the MSK of the inner method.  The
-MSK is truncated at 32 octets if it is longer than 32 octets or
-padded to a length of 32 octets with zeros if it is less than 32
-octets.
+>
+> If an inner method does not support export of an Extended Master
+> Session Key (EMSK), then the IMSK is derived from the MSK of the inner method.  The
+> EMSK or MSK is truncated at 32 octets if it is longer than 32 octets or
+> padded to a length of 32 octets with zeros if it is less than 32
+> octets.
+>
+> If no inner EAP authentication method is run then no EMSK or MSK
+> will be generated (e.g. when basic password authentication
+> is used or when no inner method has been run and the crypto-binding TLV
+> for the Result-TLV needs to be generated).  In this case, IMSK\[j]
+> is set to zero (i.e., MSK = 32 octets of 0x00s).
 
 However, it is possible that the peer and server sides might not have
 the same capability to export EMSK.  In order to maintain maximum
@@ -2928,30 +2934,26 @@ On the receiver of the Crypto-Binding TLV side:
 > If the EMSK is not available and an MSK-based Compound MAC was
 > sent, then the receiver validates the Compound MAC and sends back
 > an MSK-based Compound MAC response.
-
+>
 > If the EMSK is not available and no MSK-based Compound MAC was
 > sent, then the receiver handles like an invalid Crypto-Binding TLV
 > with a fatal error.
-
+>
 > If the EMSK is available and an EMSK-based Compound MAC was sent,
 > then the receiver validates it and creates a response Compound MAC
 > using the EMSK.
-
+>
 > If the EMSK is available but no EMSK-based Compound MAC was sent
 > and its policy accepts MSK-based MAC, then the receiver validates
 > it using the MSK and, if successful, generates and returns an MSK-
 > based Compound MAC.
-
+>
 > If the EMSK is available but no EMSK Compound MAC was sent and its
 > policy does not accept MSK-based MAC, then the receiver handles
 > like an invalid Crypto-Binding TLV with a fatal error.
 
-If no inner EAP authentication method is run then no EMSK or MSK
-will be generated (e.g. when basic password authentication
-is used or when no inner method has been run and the crypto-binding TLV
-for the Result-TLV needs to be generated).  In this case, IMSK\[j]
-is set to zero (i.e., MSK = 32 octets of 0x00s).  If an inner method
-results in failure, then it is not included in this calculation.
+If an inner method results in failure, then it is not included in this
+calculation.
 
 The derivation of S-IMCK is as follows:
 

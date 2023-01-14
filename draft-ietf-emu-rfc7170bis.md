@@ -2869,8 +2869,8 @@ the IMCK MUST be recalculated after each successful inner method.
 The first step in these calculations is the generation of the base
 compound key, IMCK\[j] from the session_key_seed, and any session keys
 derived from the successful execution of jth inner
-methodsn. The inner method(s) MUST
-provide Inner Method Session Keys (IMSKs), IMSK1..IMSKn, corresponding
+methods. The inner method(s) MUST
+provide Inner Method Session Keys (IMSKs), IMSK\[1]..IMSK\[n], corresponding
 to inner method 1 through n.  When a particular authentication method
 does not provide key material (such as with password exchange) then a special "all zero" IMSK
 is used as described below.
@@ -2959,7 +2959,6 @@ The derivation of S-IMCK is as follows:
 
 ~~~~
    S-IMCK[0] = session_key_seed
-   CMK[0] = last 20 octets of IMCK[0]
    For j = 1 to n-1 do
         IMCK[j] = the first 60 octets of TLS-PRF(S-IMCK[j-1],
              "Inner Methods Compound Keys" |
@@ -2968,8 +2967,12 @@ The derivation of S-IMCK is as follows:
         CMK[j] = last 20 octets of IMCK[j]
 ~~~~
 
-where "\|" denotes concatenation, and TLS-PRF is the PRF negotiated as part of TLS handshake
-{{RFC5246}}.
+where "\|" denotes concatenation, and TLS-PRF is the PRF negotiated as
+part of TLS handshake {{RFC5246}}.  The value j refers to a
+corresponding inner method 1 through n.  The special value of
+S-IMCK[0] is used to bootstrap the calculations, and can be done as
+soon as the TLS connection is established, and before any inner
+methods are run.
 
 In practice, the requirement to use either MSK or EMSK means that an
 implement MUST track two independent derivations of IMCK[j], one which

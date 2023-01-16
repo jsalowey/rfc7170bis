@@ -3052,18 +3052,18 @@ following derivation:
 ~~~
    MSK  = the first 64 octets of TLS-PRF(S-IMCK[n],
           "Session Key Generating Function")
-   EMSK = the first 64 octets ofTLS-PRF(S-IMCK[n],
+   EMSK = the first 64 octets of TLS-PRF(S-IMCK[n],
           "Extended Session Key Generating Function")
 ~~~
 
-where "\|" denotes concatenation and the TLS-PRF is defined in
-{{RFC5246}} as
+The TLS-PRF is defined in {{RFC5246}} as
 
 ~~~
-   PRF(secret, label, seed) = P_\<hash>(secret, label \| seed).
+   PRF(secret, label, seed) = P_<hash>(secret, label | seed).
 ~~~
 
-The secret is S-IMCK\[n] where n is the number of the last generated
+where "|" denotes concatenation. The secret is S-IMCK\[n] where n is the
+number of the last generated
 S-IMCK\[j] from [](#intermediate-compound-key).  The label is is the ASCII
 value for the string without quotes.  The seed is empty (0 length) and
 is omitted from the derivation.

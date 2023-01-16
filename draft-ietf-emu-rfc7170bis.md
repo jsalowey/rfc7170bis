@@ -2961,13 +2961,13 @@ The derivation of S-IMCK is as follows:
    S-IMCK[0] = session_key_seed
    For j = 1 to n-1 do
         IMCK[j] = the first 60 octets of TLS-PRF(S-IMCK[j-1],
-             "Inner Methods Compound Keys" |
+             "Inner Methods Compound Keys",
              IMSK[j])
         S-IMCK[j] = first 40 octets of IMCK[j]
         CMK[j] = last 20 octets of IMCK[j]
 ~~~~
 
-where "\|" denotes concatenation, and TLS-PRF is the PRF negotiated as
+where TLS-PRF is the PRF described above negotiated as
 part of TLS handshake {{RFC5246}}.  The value j refers to a
 corresponding inner method 1 through n.  The special value of
 S-IMCK[0] is used to bootstrap the calculations, and can be done as

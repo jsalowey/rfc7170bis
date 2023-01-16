@@ -3487,37 +3487,42 @@ identity.
 
 # Acknowledgements
 
-This specification is based on EAP-FAST {{RFC4851}}, which included the
-ideas and efforts of Nancy Cam-Winget, David McGrew, Joe Salowey, Hao
-Zhou, Pad Jakkahalli, Mark Krischer, Doug Smith, and Glen Zorn of
-Cisco Systems, Inc.
+Nearly all of the text in this document was taken directly from
+{{RFC7170}}. We are grateful to the original authors and reviewers for
+that document.  The acknowledgements given here are only for the
+changes which resulted in this document.
 
-The TLV processing was inspired from work on the Protected Extensible
-Authentication Protocol version 2 (PEAPv2) with Ashwin Palekar, Dan
-Smith, Sean Turner, and Simon Josefsson.
+Alexander Clouter provided substantial and detailed technical feedback
+on nearly every aspect of the specification.  The corrections in this
+document are based on his work.
 
-The method for linking identity and proof-of-possession by placing
-the tls-unique value in the challenge\Password field of the CSR as
-described in [](#cert-provisioning) was inspired by the technique described in
-"Enrollment over Secure Transport" {{RFC7030}}.
-
-Helpful review comments were provided by Russ Housley, Jari Arkko,
-Ilan Frenkel, Jeremy Steiglitz, Dan Harkins, Sam Hartman, Jim Schaad,
-Barry Leiba, Stephen Farrell, Chris Lonvick, and Josh Howlett.
+We wish to thank the many reviewers and commenters in the EMU WG,
+including Eliot Lear, Jouni Malinen, Joe Salowey, Heikki Vatiainen,
+and Bruno Pereria Vidal.
 
 # Changes from RFC 7170
 
 Alan DeKok was added as editor.
 
-The document was converted to Markdown, from the RFC 7170 output.
+The document was converted to Markdown, from the {{RFC7170}} text output.
 
-Formatting changes result from differences between using Markdown
+Any formatting changes mostly result from differences between using Markdown
 versus XML for source.
 
-The IANA considerations section was removed, as the registries already
-exist.
+The IANA considerations section was replaced with a note to change the
+IANA registry references to this document.
 
-There should be no other content changes from RFC 7170.
+A new section was added to explain that the inner EAP-MSCHAPv2
+derivation follows EAP-FAST.  This is the largest technical change
+from the previous revision of this document, and follows existing implementations.
+
+Many small changes have been made throughout the document to correct
+inconsistencies, and to address mistakes.  At a high level:
+
+* All open errata have been addressed.
+* A new term "inner method" has been defined.
+* The definitions and derivation of IMSK, S-IMCK, etc. have been corrected and clarified.
+* The diagrams in Appendix C have been updated to match the TEAP state machine
 
 # Appendix A Evaluation against Tunnel-Based EAP Method Requirements
 {:numbered="false"}

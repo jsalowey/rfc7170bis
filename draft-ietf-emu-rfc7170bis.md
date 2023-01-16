@@ -3010,10 +3010,10 @@ the MAC field is filled with zeros.
 The Compound MAC computation is as follows:
 
 ~~~~
-   Compound-MAC = the first 20 octets of MAC( CMK[j], BUFFER )
+   Compound-MAC = the first 20 octets of MAC( CMK[n], BUFFER )
 ~~~~
 
-where j is the number of the last successfully executed inner
+where n is the number of the last successfully executed inner
 method, MAC is the MAC function negotiated in TLS (e.g. TLS 1.2 in {{RFC5246}}), and
 BUFFER is created after concatenating these fields in the following
 order:

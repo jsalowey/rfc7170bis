@@ -22,22 +22,10 @@ author:
   name: Alan DeKok
   email: aland@freeradius.org
 
-- ins: H. Zhou
-  name: Hao Zhou
-  email: hzhou@cisco.com
-
 - ins: J. Salowey
   name: Joseph Salowey
+  organization: Venafi
   email: joe@salowey.net
-
-- ins: N. Cam-Winget
-  name: Nancy Cam-Winget
-  org: Cisco
-  email: ncamwing@cisco.com
-
-- ins: S. Hanna
-  name: Stephen Hanna
-  email: steve.hanna@infineon.com
 
 normative:
   BCP14: RFC8174
@@ -3503,6 +3491,20 @@ document are based on his work.
 We wish to thank the many reviewers and commenters in the EMU WG,
 including Eliot Lear, Jouni Malinen, Joe Salowey, Heikki Vatiainen,
 and Bruno Pereria Vidal.
+
+# Contributors
+
+Hao Zhou
+(Co-Author of RFC 7170)
+
+Nancy Cam-Winget
+(Co-Author of RFC 7170)
+Cisco
+ncamwing@cisco.com
+
+Stephen Hanna
+(Co-Author of RFC 7170)
+steve.hanna@infineon.com
 
 # Changes from RFC 7170
 

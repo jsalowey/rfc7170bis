@@ -459,6 +459,10 @@ successful conclusion of the TEAP Phase 1 conversation, the
 conversation then continues on to Phase 2.
 
 
+### TLS Session Resume Using a PAC {#resume-pac}
+
+THis section is removed. 
+
 ### Transition between Abbreviated and Full TLS Handshake
 
 If session resumption based on server-side or client-side state

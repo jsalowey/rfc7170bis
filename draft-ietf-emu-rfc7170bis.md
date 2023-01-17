@@ -986,7 +986,9 @@ the user not to disclose the shared secret to an attacker.  In these
 cases, the parties who participate in the authentication need to be
 considered when evaluating whether to use peer services.
 
+
 ### PAC Provisioning
+ToDo: Remove this section
 
 To request provisioning of a PAC, a peer sends a PAC TLV as defined
 in [](#pac-tlv-format) containing a PAC Attribute as defined in

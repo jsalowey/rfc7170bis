@@ -168,7 +168,7 @@ appear in all capitals, as shown here.
 Much of the terminology in this document comes from {{RFC3748}}.
 Additional terms are defined below:
 
-Remove PAC?
+ToDO: Remove PAC?
 
 Protected Access Credential (PAC)
 

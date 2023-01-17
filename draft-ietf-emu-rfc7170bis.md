@@ -168,6 +168,8 @@ appear in all capitals, as shown here.
 Much of the terminology in this document comes from {{RFC3748}}.
 Additional terms are defined below:
 
+Remove PAC?
+
 Protected Access Credential (PAC)
 
 > Credentials distributed to a peer for future optimized network

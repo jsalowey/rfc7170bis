@@ -461,7 +461,7 @@ conversation then continues on to Phase 2.
 
 ### TLS Session Resume Using a PAC {#resume-pac}
 
-THis section is removed. 
+THis section is removed.
 
 ### Transition between Abbreviated and Full TLS Handshake
 

@@ -3493,18 +3493,19 @@ including Eliot Lear, Jouni Malinen, Joe Salowey, Heikki Vatiainen,
 and Bruno Pereria Vidal.
 
 # Contributors
+~~~~
+      Nancy Cam-Winget
+      (Co-Author of RFC 7170)
+      Cisco
+      ncamwing@cisco.com
 
-Hao Zhou
-(Co-Author of RFC 7170)
+      Stephen Hanna
+      (Co-Author of RFC 7170)
+      steve.hanna@infineon.com
 
-Nancy Cam-Winget
-(Co-Author of RFC 7170)
-Cisco
-ncamwing@cisco.com
-
-Stephen Hanna
-(Co-Author of RFC 7170)
-steve.hanna@infineon.com
+      Hao Zhou
+      (Co-Author of RFC 7170)
+~~~~
 
 # Changes from RFC 7170
 

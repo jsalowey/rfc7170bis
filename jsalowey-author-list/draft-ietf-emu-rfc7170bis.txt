@@ -3497,11 +3497,17 @@ Table of Contents
 
 9.  Contributors
 
-   Hao Zhou (Co-Author of RFC 7170)
+         Nancy Cam-Winget
+         (Co-Author of RFC 7170)
+         Cisco
+         ncamwing@cisco.com
 
-   Nancy Cam-Winget (Co-Author of RFC 7170) Cisco ncamwing@cisco.com
+         Stephen Hanna
+         (Co-Author of RFC 7170)
+         steve.hanna@infineon.com
 
-   Stephen Hanna (Co-Author of RFC 7170) steve.hanna@infineon.com
+         Hao Zhou
+         (Co-Author of RFC 7170)
 
 10.  Changes from RFC 7170
 

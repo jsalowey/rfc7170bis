@@ -458,80 +458,10 @@ tunnel establishment based on a TLS abbreviated handshake.  After a
 successful conclusion of the TEAP Phase 1 conversation, the
 conversation then continues on to Phase 2.
 
+
 ### TLS Session Resume Using a PAC {#resume-pac}
 
-TEAP supports the resumption of sessions based on server state being
-stored on the client side using the TLS SessionTicket extension
-techniques described in {{RFC5077}}.  This version of TEAP supports the
-provisioning of a ticket called a Protected Access Credential (PAC)
-through the use of the NewSessionTicket handshake described in
-{{RFC5077}}, as well as provisioning of a PAC inside the protected
-tunnel.  Implementations MUST support the TLS Ticket extension
-{{RFC5077}} mechanism for distributing a PAC and may provide additional
-ways to provision the PAC, such as manual configuration.  Since the
-PAC mentioned here is used for establishing the TLS tunnel, it is
-more specifically referred to as the Tunnel PAC.  The Tunnel PAC is a
-security credential provided by the EAP server to a peer and
-comprised of:
-
-1.  PAC-Key: this is the key used by the peer as the TLS master
-secret to establish the TEAP Phase 1 tunnel.  The PAC-Key is a
-strong, high-entropy, at minimum 48-octet key and is typically
-the master secret from a previous TLS session.  The PAC-Key is a
-secret and MUST be treated accordingly.  Otherwise, if leaked, it
-could lead to user credentials being compromised if sent within
-the tunnel established using the PAC-Key.  In the case that a
-PAC-Key is provisioned to the peer through another means, it MUST
-have its confidentiality and integrity protected by a mechanism,
-such as the TEAP Phase 2 tunnel.  The PAC-Key MUST be stored
-securely by the peer.
-
-2.  PAC-Opaque: this is a variable-length field containing the ticket
-that is sent to the EAP server during the TEAP Phase 1 tunnel
-establishment based on {{RFC5077}}.  The PAC-Opaque can only be
-interpreted by the EAP server to recover the required information
-for the server to validate the peer's identity and
-authentication.  The PAC-Opaque includes the PAC-Key and other
-TLS session parameters.  It may contain the PAC's peer identity.
-The PAC-Opaque format and contents are specific to the PAC
-issuing server.  The PAC-Opaque may be presented in the clear, so
-an attacker MUST NOT be able to gain useful information from the
-PAC-Opaque itself.  The server issuing the PAC-Opaque needs to
-ensure it is protected with strong cryptographic keys and
-algorithms.  The PAC-Opaque may be distributed using the
-NewSessionTicket message defined in {{RFC5077}}, or it may be
-distributed through another mechanism such as the Phase 2 TLVs
-defined in this document.
-
-3.  PAC-Info: this is an optional variable-length field used to
-provide, at a minimum, the authority identity of the PAC issuer.
-Other useful but not mandatory information, such as the PAC-Key
-lifetime, may also be conveyed by the PAC-issuing server to the
-peer during PAC provisioning or refreshment.  PAC-Info is not
-included if the NewSessionTicket message is used to provision the
-PAC.
-
-The use of the PAC is based on the SessionTicket extension defined in
-{{RFC5077}}.  The EAP server initiates the TEAP conversation as normal.
-Upon receiving the Authority-ID TLV from the server, the peer checks
-to see if it has an existing valid PAC-Key and PAC-Opaque for the
-server.  If it does, then it obtains the PAC-Opaque and puts it in
-the SessionTicket extension in the ClientHello.  It is RECOMMENDED in
-TEAP that the peer include an empty Session ID in a ClientHello
-containing a PAC-Opaque.  This version of TEAP supports the
-NewSessionTicket Handshake message as described in {{RFC5077}} for
-distribution of a new PAC, as well as the provisioning of PAC inside
-the protected tunnel.  If the PAC-Opaque included in the
-SessionTicket extension is valid and the EAP server permits the
-abbreviated TLS handshake, it will select the ciphersuite from
-information within the PAC-Opaque and finish with the abbreviated TLS
-handshake.  If the server receives a Session ID and a PAC-Opaque in
-the SessionTicket extension in a ClientHello, it should place the
-same Session ID in the ServerHello if it is resuming a session based
-on the PAC-Opaque.  The conversation then proceeds as described in
-{{RFC5077}} until the handshake completes or a fatal error occurs.
-After the abbreviated handshake completes, the peer and the server
-are ready to commence Phase 2.
+THis section is removed.
 
 ### Transition between Abbreviated and Full TLS Handshake
 
